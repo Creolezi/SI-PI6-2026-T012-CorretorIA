@@ -1,0 +1,146 @@
+[
+  {
+    "id": "itaim_bibi",
+    "nome": "Itaim Bibi",
+    "zona": "Zona Sul/Oeste",
+    "preco_m2_base": 16800,
+    "valorizacao_anual": 0.065,
+    "descricao": "Polo financeiro e corporativo nobre, altíssima liquidez e valorização contínua."
+  },
+  {
+    "id": "pinheiros",
+    "nome": "Pinheiros",
+    "zona": "Zona Oeste",
+    "preco_m2_base": 14900,
+    "valorizacao_anual": 0.058,
+    "descricao": "Bairro cosmopolita, alta demanda de jovens profissionais e proximidade com transporte."
+  },
+  {
+    "id": "moema",
+    "nome": "Moema",
+    "zona": "Zona Sul",
+    "preco_m2_base": 15400,
+    "valorizacao_anual": 0.055,
+    "descricao": "Região plana com excelente infraestrutura urbana e proximidade com o Parque Ibirapuera."
+  },
+  {
+    "id": "jardim_paulista",
+    "nome": "Jardim Paulista",
+    "zona": "Zona Oeste",
+    "preco_m2_base": 16200,
+    "valorizacao_anual": 0.060,
+    "descricao": "Endereço nobre tradicional de São Paulo, entre a Av. Paulista e o Ibirapuera."
+  },
+  {
+    "id": "vila_madalena",
+    "nome": "Vila Madalena",
+    "zona": "Zona Oeste",
+    "preco_m2_base": 13900,
+    "valorizacao_anual": 0.052,
+    "descricao": "Centro cultural e gastronômico de alta procura com imóveis diferenciados."
+  },
+  {
+    "id": "perdizes",
+    "nome": "Perdizes",
+    "zona": "Zona Oeste",
+    "preco_m2_base": 12600,
+    "valorizacao_anual": 0.048,
+    "descricao": "Bairro residencial tradicional com faculdades renomadas e alta estabilidade de preços."
+  },
+  {
+    "id": "vila_mariana",
+    "nome": "Vila Mariana",
+    "zona": "Zona Sul",
+    "preco_m2_base": 12300,
+    "valorizacao_anual": 0.050,
+    "descricao": "Eixo educacional e médico, localização estratégica e forte liquidez de locação e venda."
+  },
+  {
+    "id": "brooklin",
+    "nome": "Brooklin",
+    "zona": "Zona Sul",
+    "preco_m2_base": 13200,
+    "valorizacao_anual": 0.054,
+    "descricao": "Próximo à Berrini e Chucri Zaidan, com imóveis modernos e perfil corporativo."
+  },
+  {
+    "id": "campo_belo",
+    "nome": "Campo Belo",
+    "zona": "Zona Sul",
+    "preco_m2_base": 12800,
+    "valorizacao_anual": 0.051,
+    "descricao": "Bairro residencial arborizado com condomínios de alto padrão."
+  },
+  {
+    "id": "tatuape",
+    "nome": "Tatuapé",
+    "zona": "Zona Leste",
+    "preco_m2_base": 10200,
+    "valorizacao_anual": 0.046,
+    "descricao": "Principal centro econômico e residencial nobre da Zona Leste da capital."
+  },
+  {
+    "id": "mooca",
+    "nome": "Mooca",
+    "zona": "Zona Leste",
+    "preco_m2_base": 9500,
+    "valorizacao_anual": 0.042,
+    "descricao": "Bairro histórico tradicional com forte expansão de novos condomínios clube."
+  },
+  {
+    "id": "bela_vista",
+    "nome": "Bela Vista",
+    "zona": "Centro/Sul",
+    "preco_m2_base": 9900,
+    "valorizacao_anual": 0.045,
+    "descricao": "Próximo à Avenida Paulista, teatros e hospitais; alta procura por apartamentos compactos."
+  },
+  {
+    "id": "santana",
+    "nome": "Santana",
+    "zona": "Zona Norte",
+    "preco_m2_base": 8700,
+    "valorizacao_anual": 0.040,
+    "descricao": "Principal polo comercial e residencial da Zona Norte paulistana."
+  },
+  {
+    "id": "saude",
+    "nome": "Saúde",
+    "zona": "Zona Sul",
+    "preco_m2_base": 9300,
+    "valorizacao_anual": 0.044,
+    "descricao": "Atendido pela Linha Azul do metrô, bairro familiar com excelente relação custo-benefício."
+  },
+  {
+    "id": "lapa",
+    "nome": "Lapa",
+    "zona": "Zona Oeste",
+    "preco_m2_base": 9600,
+    "valorizacao_anual": 0.043,
+    "descricao": "Tradicional bairro da zona oeste com forte comércio e novos empreendimentos residenciais."
+  },
+  {
+    "id": "morumbi",
+    "nome": "Morumbi",
+    "zona": "Zona Sul",
+    "preco_m2_base": 9000,
+    "valorizacao_anual": 0.038,
+    "descricao": "Bairro de grandes metragens e condomínios fechados, com ampla variação de perfis."
+  },
+  {
+    "id": "ipiranga",
+    "nome": "Ipiranga",
+    "zona": "Zona Sul",
+    "preco_m2_base": 8900,
+    "valorizacao_anual": 0.042,
+    "descricao": "Bairro histórico em acelerada revitalização urbana e valorização imobiliária."
+  },
+  {
+    "id": "aclimacao",
+    "nome": "Aclimação",
+    "zona": "Centro/Sul",
+    "preco_m2_base": 10600,
+    "valorizacao_anual": 0.047,
+    "descricao": "Região nobre ao redor do Parque da Aclimação com atmosfera tranquila e residencial."
+  }
+]
