@@ -19,6 +19,25 @@ O nosso sistema, batizado de **CorretorIA**, é uma ferramenta prática para o c
 
 ---
 
+## 💻 Formatos de Apresentação para o Professor
+
+O projeto está estruturado em **duas frentes** para a apresentação da banca/professor:
+
+1. 📓 **Jupyter Notebook Acadêmico (`CorretorIA_Apresentacao_PI6.ipynb`):**
+   * Perfeito para mostrar o passo a passo da IA célula por célula ao professor:
+     * Carga dos dados e EDA (Análise Exploratória).
+     * Ranking e distribuição do valor do m² por bairro de São Paulo.
+     * Engenharia de atributos (`ColumnTransformer`, `OneHotEncoder`, `StandardScaler`).
+     * Treinamento do modelo `RandomForestRegressor`.
+     * Métricas de validação ($R^2 = 97.58\%$ e $MAPE = 9.63\%$).
+     * Simulador interativo em Python com impressão do parecer técnico.
+
+2. 🌐 **Aplicação Web Interativa (FastAPI + Frontend Moderno):**
+   * Dashboard visual completo para simular em tempo real como um consultor usaria no dia a dia.
+   * Criamos o script **`executar_sistema.bat`** (basta dar 2 cliques para iniciar tudo e abrir o navegador automaticamente).
+
+---
+
 ## 🗄️ De Onde Veio o Nosso Dataset?
 
 Para treinar o nosso modelo, a gente utilizou uma base estruturada com **7.500 registros de transações imobiliárias da cidade de São Paulo**, abrangendo o período histórico de **2013 até 2026**.
@@ -56,61 +75,62 @@ Com base nesse desvio padrão, criamos:
 ## 💻 Estrutura do Repositório
 
 ```text
-SI-PI6-2026-T012- IA para corretor!/
+SI-PI6-2026-T012-CorretorIA/
+├── CorretorIA_Apresentacao_PI6.ipynb # Jupyter Notebook para apresentar ao professor
+├── executar_sistema.bat              # Script de 2 cliques para rodar tudo no laptop
 ├── data/
-│   ├── bairros_sp.json           # Lista dos bairros de SP com m² de referência
-│   └── dataset_sp_imoveis.csv    # Dataset com 7.500 registros de SP (2013-2026)
+│   ├── bairros_sp.json               # Lista dos bairros de SP com m² de referência
+│   └── dataset_sp_imoveis.csv        # Dataset com 7.500 registros de SP (2013-2026)
 ├── ml/
 │   ├── __init__.py
-│   └── pricing_model.py          # Código do modelo de Machine Learning (Random Forest)
+│   └── pricing_model.py              # Código do modelo de Machine Learning (Random Forest)
+├── notebooks/
+│   └── CorretorIA_Modelagem_e_Apresentacao.ipynb
 ├── scripts/
-│   └── prepare_dataset.py        # Script para gerar/limpar a base
+│   ├── prepare_dataset.py            # Script para gerar/limpar a base
+│   └── generate_notebook.py          # Script gerador do Jupyter Notebook
 ├── static/
-│   ├── index.html                # Tela do corretor (HTML5 moderno)
-│   ├── styles.css                # Estilo limpo e responsivo (CSS3)
-│   └── app.js                    # Conexão da tela com a API (JavaScript)
+│   ├── index.html                    # Tela do corretor (HTML5 moderno)
+│   ├── styles.css                    # Estilo limpo e responsivo (CSS3)
+│   └── app.js                        # Conexão da tela com a API (JavaScript)
 ├── docs/
-│   └── PROPOSTA_PI6.md           # Proposta técnica detalhada para o professor
+│   └── PROPOSTA_PI6.md               # Proposta técnica detalhada para o professor
 ├── tests/
-│   └── test_api.py               # Testes automatizados do modelo e das rotas
-├── main.py                       # Backend em FastAPI
-├── requirements.txt              # Bibliotecas necessárias
-└── README.md                     # Este arquivo
+│   └── test_api.py                   # Testes automatizados do modelo e das rotas
+├── main.py                           # Backend em FastAPI
+├── requirements.txt                  # Bibliotecas necessárias
+└── README.md                         # Este arquivo
 ```
 
 ---
 
-## 🚀 Como Rodar o Projeto na Sua Máquina
+## 🚀 Como Rodar no Notebook / Computador da Apresentação
 
-### 1. Clonar o Repositório
+### Opção A: Execução em 1 Clique (Aplicação Web Completa)
+Basta dar **dois cliques no arquivo `executar_sistema.bat`** na pasta do projeto!
+Ele vai:
+1. Checar o Python e as dependências;
+2. Iniciar o servidor local;
+3. Abrir o navegador automaticamente em [http://localhost:8000](http://localhost:8000).
+
+---
+
+### Opção B: Rodar o Jupyter Notebook da Apresentação
+Abra o arquivo **`CorretorIA_Apresentacao_PI6.ipynb`** no VS Code ou inicie o Jupyter com:
 ```bash
-git clone <URL_DO_REPOSITORIO>
-cd "SI-PI6-2026-T012- IA para corretor!"
+jupyter notebook CorretorIA_Apresentacao_PI6.ipynb
 ```
+*(Ou arraste o arquivo `.ipynb` diretamente para o [Google Colab](https://colab.research.google.com/)).*
 
-### 2. Instalar as Dependências
-Recomendamos usar Python 3.10 ou superior. No terminal:
+---
+
+### Opção C: Rodar Manualmente pelo Terminal
 ```bash
+# 1. Instalar dependências
 pip install -r requirements.txt
-```
 
-*(As bibliotecas usadas são: `fastapi`, `uvicorn`, `scikit-learn`, `pandas`, `numpy` e `pydantic`).*
-
-### 3. Rodar o Servidor
-Execute:
-```bash
+# 2. Iniciar o servidor
 python main.py
-```
-*(Ou se preferir via uvicorn: `uvicorn main:app --reload`).*
-
-### 4. Acessar no Navegador
-* **Sistema do Corretor:** [http://localhost:8000](http://localhost:8000)
-* **Documentação das Rotas (Swagger):** [http://localhost:8000/docs](http://localhost:8000/docs)
-
-### 5. Rodar os Testes
-Para verificar se tudo está funcionando direitinho:
-```bash
-python tests/test_api.py
 ```
 
 ---
