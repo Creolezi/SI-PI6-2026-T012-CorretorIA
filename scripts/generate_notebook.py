@@ -77,14 +77,36 @@ add_md("""## 2. Ingestão da Base de Dados de São Paulo
 * **Origem dos Dados:** Base histórica com **7.500 registros** de transações da capital paulista cobrindo a série de **2013 a 2026**, calibrada nos padrões públicos de transações de ITBI (Prefeitura de SP e GeoSampa).
 * **Decisão Metodológica (Foco em SP):** Como a demanda do orientador é de cobertura ampla, adotamos o mercado de São Paulo como base piloto pela alta liquidez e volume de dados limpos, deixando a modelagem estruturada para receber dados de outros estados (MG, SC, etc.) nas próximas etapas.""")
 
-add_code("""dataset_path = os.path.join("data", "dataset_sp_imoveis.csv")
+add_code("""# Busca automática e inteligente do dataset em qualquer pasta que o notebook seja aberto
+possible_paths = [
+    os.path.join("data", "dataset_sp_imoveis.csv"),
+    os.path.join("..", "data", "dataset_sp_imoveis.csv"),
+    os.path.join(os.path.expanduser("~"), "Downloads", "SI-PI6-2026-T012- IA para corretor!", "data", "dataset_sp_imoveis.csv"),
+    os.path.join(os.path.expanduser("~"), "Downloads", "SI-PI6-2026-T012-CorretorIA", "data", "dataset_sp_imoveis.csv")
+]
 
-if not os.path.exists(dataset_path):
-    # Se rodado de dentro de outra pasta
-    dataset_path = os.path.abspath(os.path.join("..", "data", "dataset_sp_imoveis.csv"))
+dataset_path = None
+for p in possible_paths:
+    if os.path.exists(p):
+        dataset_path = os.path.abspath(p)
+        break
+
+# Se ainda não encontrou pelos caminhos padrões, busca na pasta atual ou filhas
+if not dataset_path:
+    for root, dirs, files in os.walk(os.getcwd()):
+        if "dataset_sp_imoveis.csv" in files:
+            dataset_path = os.path.join(root, "dataset_sp_imoveis.csv")
+            break
+
+# Fallback: Se for rodado no Google Colab ou se o arquivo não estiver local
+if not dataset_path:
+    github_url = "https://raw.githubusercontent.com/Creolezi/SI-PI6-2026-T012-CorretorIA/main/data/dataset_sp_imoveis.csv"
+    print("Carregando base diretamente do GitHub do grupo...")
+    dataset_path = github_url
 
 df = pd.read_csv(dataset_path)
 
+print(f"Base carregada com sucesso a partir de: {dataset_path}")
 print(f"Total de registros carregados: {len(df):,}")
 print(f"Dimensões do dataset: {df.shape[0]} linhas x {df.shape[1]} colunas\\n")
 df.head(5)""")
