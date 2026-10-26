@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CorretorIA - Inteligência de Precificação Imobiliária</title>
+  <title>CorretorIA - Inteligência de Precificação Imobiliária (SP & SC)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -22,11 +22,17 @@
         </div>
         <div>
           <div class="brand-title">Corretor<span>IA</span></div>
-          <div class="brand-subtitle">Valuation Inteligente & Precificação para Consultores</div>
+          <div class="brand-subtitle">Valuation Inteligente • São Paulo & Santa Catarina</div>
         </div>
       </div>
 
       <div class="header-badges">
+        <button class="btn btn-benchmark-header" id="btn-open-benchmark">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          Comparativo de 3 Modelos (K-Fold)
+        </button>
         <span class="badge badge-academic">SI-PI6 2026 • Turma 012</span>
         <span class="badge badge-status" id="system-status-badge">
           <span class="status-dot"></span> IA Operacional
@@ -35,7 +41,7 @@
     </div>
   </header>
 
-  <!-- Seletor de Estado (Multi-Estado / Visão Nacional) -->
+  <!-- Seletor de Estado (Multi-Estado: SP e SC Ativos!) -->
   <section class="state-selector-bar">
     <div class="container state-selector-content">
       <span class="state-label">
@@ -47,15 +53,14 @@
         Região de Atuação:
       </span>
       <div class="state-pills" id="state-pills-container">
-        <!-- Renderizado dinamicamente via JS -->
         <button class="state-pill active" data-uf="SP">
-          <span class="pill-dot active"></span> São Paulo (Piloto Ativo)
+          <span class="pill-dot active"></span> São Paulo (Ativo)
         </button>
-        <button class="state-pill disabled" data-uf="MG" title="Fase 2 de Expansão">
+        <button class="state-pill" data-uf="SC">
+          <span class="pill-dot active"></span> Santa Catarina <span class="pill-tag-new">Novo!</span>
+        </button>
+        <button class="state-pill disabled" data-uf="MG" title="Fase 3 de Expansão">
           Minas Gerais <span class="pill-tag">Em breve</span>
-        </button>
-        <button class="state-pill disabled" data-uf="SC" title="Fase 2 de Expansão">
-          Santa Catarina <span class="pill-tag">Em breve</span>
         </button>
         <button class="state-pill disabled" data-uf="RJ" title="Fase 3 de Expansão">
           Rio de Janeiro <span class="pill-tag">Em breve</span>
@@ -79,19 +84,21 @@
             </svg>
             Parâmetros do Imóvel
           </h2>
-          <p class="card-subtitle">Insira as características para o cálculo hedônico de valor de mercado</p>
+          <p class="card-subtitle">
+            Mercado Ativo: <strong id="lbl-estado-ativo">São Paulo (SP)</strong> — Avaliação por precificação hedônica
+          </p>
         </div>
 
         <form id="pricing-form" class="form-body">
           
-          <!-- Bairro -->
+          <!-- Bairro / Região -->
           <div class="form-group">
             <label for="bairro-select">
-              Bairro (São Paulo) <span class="required">*</span>
+              <span id="label-bairro-titulo">Bairro (São Paulo)</span> <span class="required">*</span>
             </label>
             <div class="select-wrapper">
               <select id="bairro-select" required>
-                <option value="" disabled selected>Carregando bairros homologados...</option>
+                <option value="" disabled selected>Carregando localidades...</option>
               </select>
             </div>
             <span class="field-hint" id="bairro-hint">Selecione a região para calibrar a referência do m².</span>
@@ -304,33 +311,108 @@
       </section>
     </div>
 
-    <!-- Seção de Inteligência de Mercado / Benchmarks -->
+    <!-- Seção de Benchmark Didático de 3 Modelos (Validação Cruzada K-Fold) -->
+    <section class="card benchmark-section" id="benchmark-section">
+      <div class="card-header">
+        <div class="benchmark-header-wrap">
+          <div>
+            <h2>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 20V10M12 20V4M6 20v-6"></path>
+              </svg>
+              Comparativo Científico de Modelos (Validação Cruzada 5-Fold)
+            </h2>
+            <p class="card-subtitle">
+              Avaliação empírica de 3 abordagens distintas sobre a base integrada de 12.500 registros (SP e SC)
+            </p>
+          </div>
+          <span class="badge badge-kfold">5 Folds • Sem Overfitting</span>
+        </div>
+      </div>
+
+      <!-- Tabela Comparativa dos 3 Modelos -->
+      <div class="table-responsive">
+        <table class="market-table benchmark-table">
+          <thead>
+            <tr>
+              <th>Modelo de Inteligência Artificial</th>
+              <th>Família / Tipo</th>
+              <th>Acurácia (R² Médio)</th>
+              <th>Erro Médio em R$ (MAE)</th>
+              <th>Erro Percentual (MAPE)</th>
+              <th>Tempo de Treino</th>
+              <th>Classificação</th>
+            </tr>
+          </thead>
+          <tbody id="benchmark-table-body">
+            <!-- Renderizado dinamicamente -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Cards Didáticos Explicando os 3 Modelos e a Validação Cruzada -->
+      <div class="didactic-grid">
+        <div class="didactic-card">
+          <div class="didactic-tag baseline">Modelo 1 • Baseline</div>
+          <h4>Regressão Linear (Ridge)</h4>
+          <p class="didactic-desc">
+            Assume que o preço é uma soma ponderada direta dos atributos. É ultrarrápido (0.04s), mas não capta efeitos não-lineares, resultando em um erro percentual maior (~27%).
+          </p>
+        </div>
+
+        <div class="didactic-card">
+          <div class="didactic-tag tree">Modelo 2 • Não-Linear</div>
+          <h4>Árvore de Decisão Simples</h4>
+          <p class="didactic-desc">
+            Cria regras condicionais de if/else para segmentar o mercado. Melhora o erro percentual (~20%), porém uma árvore isolada tem alta variância entre as dobras da validação cruzada.
+          </p>
+        </div>
+
+        <div class="didactic-card highlight-card">
+          <div class="didactic-tag winner">Modelo 3 • Campeão 🏆</div>
+          <h4>Random Forest (Ensemble)</h4>
+          <p class="didactic-desc">
+            Combina 100 árvores de decisão com subamostras aleatórias (Bagging). Reduz o ruído individual, atinge a maior acurácia explicada (89.11%) e o menor erro médio (~16.9%).
+          </p>
+        </div>
+
+        <div class="didactic-card kfold-card">
+          <div class="didactic-tag kfold">Metodologia Científica</div>
+          <h4>Por que Validação Cruzada (5-Fold)?</h4>
+          <p class="didactic-desc">
+            Em vez de uma divisão única e sortuda de 80/20, os dados são divididos em 5 partes. O modelo é treinado 5 vezes, testando em cada dobra separadamente para provar robustez real.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção de Inteligência de Mercado / Benchmarks por Estado -->
     <section class="card market-summary-section">
       <div class="card-header">
         <h2>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
           </svg>
-          Panorama Imobiliário de São Paulo (Benchmark de Mercado)
+          <span id="market-title-text">Panorama Imobiliário — São Paulo & Santa Catarina</span>
         </h2>
         <p class="card-subtitle">Indicadores consolidados da série histórica (2013-2026) utilizados no treinamento do modelo</p>
       </div>
 
       <div class="market-stats-row">
         <div class="stat-card">
-          <div class="stat-number" id="stat-total-amostras">7.500+</div>
-          <div class="stat-desc">Amostras de Transações em SP</div>
+          <div class="stat-number" id="stat-total-amostras">12.500</div>
+          <div class="stat-desc">Amostras Integradas (SP + SC)</div>
         </div>
         <div class="stat-card">
-          <div class="stat-number" id="stat-media-m2">R$ 12.180</div>
-          <div class="stat-desc">Valor Médio do m² na Capital</div>
+          <div class="stat-number" id="stat-media-m2">R$ 13.450</div>
+          <div class="stat-desc">Valor Médio do m² da Região</div>
         </div>
         <div class="stat-card">
-          <div class="stat-number" id="stat-r2-score">97.6%</div>
-          <div class="stat-desc">Acurácia do Modelo Preditivo (R²)</div>
+          <div class="stat-number" id="stat-r2-score">89.1%</div>
+          <div class="stat-desc">R² Médio na Validação Cruzada</div>
         </div>
         <div class="stat-card">
-          <div class="stat-number" id="stat-idade-media">14.2 anos</div>
+          <div class="stat-number" id="stat-idade-media">14.1 anos</div>
           <div class="stat-desc">Idade Média do Parque Imobiliário</div>
         </div>
       </div>
@@ -340,7 +422,7 @@
         <table class="market-table">
           <thead>
             <tr>
-              <th>Bairro</th>
+              <th>Cidade / Bairro</th>
               <th>Preço Médio / m²</th>
               <th>Ticket Médio Transacionado</th>
               <th>Volume de Dados</th>
@@ -359,7 +441,7 @@
   <footer class="app-footer">
     <div class="container footer-content">
       <p><strong>Projeto Integrador 6 (SI-PI6-2026-T012)</strong> • Engenharia de Software e Inteligência Artificial</p>
-      <p class="footer-note">Sistema de Precificação Imobiliária com Aprendizado de Máquina • Arquitetura Escalável para Cobertura Nacional</p>
+      <p class="footer-note">Sistema de Precificação Imobiliária com Aprendizado de Máquina • Cobertura São Paulo & Santa Catarina</p>
     </div>
   </footer>
 

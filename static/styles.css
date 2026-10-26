@@ -800,6 +800,163 @@ input[type="range"] {
 .liquidity-high { background: #dcfce7; color: #166534; }
 .liquidity-med { background: #fef3c7; color: #92400e; }
 
+/* Benchmark & Validação Cruzada */
+.btn-benchmark-header {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-benchmark-header:hover {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.pill-tag-new {
+  background-color: #10b981;
+  color: #ffffff;
+  font-size: 0.68rem;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.benchmark-section {
+  margin-top: 32px;
+  border: 2px solid #e0e7ff;
+  background: #ffffff;
+}
+
+.benchmark-header-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.badge-kfold {
+  background: #e0e7ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+.benchmark-table th {
+  background: #f8fafc;
+}
+
+.benchmark-winner-row td {
+  background: #f0fdf4 !important;
+  font-weight: 600;
+}
+
+.badge-rank-winner {
+  background: #dcfce7;
+  color: #15803d;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-rank-sub {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Grid Didático de Explicação */
+.didactic-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+
+@media (max-width: 980px) {
+  .didactic-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .didactic-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.didactic-card {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.didactic-card.highlight-card {
+  background: #f0fdf4;
+  border: 2px solid #86efac;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12);
+}
+
+.didactic-card.kfold-card {
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+}
+
+.didactic-tag {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.didactic-tag.baseline { background: #e2e8f0; color: #334155; }
+.didactic-tag.tree { background: #fed7aa; color: #9a3412; }
+.didactic-tag.winner { background: #22c55e; color: #ffffff; }
+.didactic-tag.kfold { background: #8b5cf6; color: #ffffff; }
+
+.didactic-card h4 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.didactic-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
 /* Rodapé */
 .app-footer {
   border-top: 1px solid var(--border-color);

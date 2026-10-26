@@ -1,7 +1,7 @@
 # CorretorIA - Sistema de Precificação Imobiliária com Inteligência Artificial
 
 > Projeto Integrador VI (SI-PI6-2026-T012)  
-> Curso: Sistemas de Informação
+> Curso: Sistemas de Informação • Sprint 2 (SP & SC + Validação Cruzada)
 
 ---
 
@@ -11,11 +11,62 @@ A gente pensou nesse projeto para resolver uma dor real que quase todo corretor 
 
 Na maioria das vezes, o proprietário quer colocar o preço lá em cima porque tem apego emocional, enquanto o comprador quer pagar o mínimo possível. Se o corretor erra a mão na avaliação, o imóvel fica "encalhado" meses no mercado, gerando custo e frustração. 
 
-O nosso sistema, batizado de **CorretorIA**, é uma ferramenta prática para o consultor imobiliário. Ele entra no sistema, preenche os dados do imóvel (bairro, metragem, ano de construção, quartos, banheiros, vagas) e o algoritmo calcula:
+O nosso sistema, batizado de **CorretorIA**, é uma ferramenta prática para o consultor imobiliário. Ele entra no sistema, seleciona o estado (São Paulo ou Santa Catarina), preenche os dados do imóvel (bairro, metragem, ano de construção, quartos, banheiros, vagas) e o algoritmo calcula:
 1. **Preço Justo Central:** Valor médio de mercado sugerido com base nos padrões históricos.
 2. **Faixa de Negociação:** Uma margem mínima (para venda rápida/liquidez) e uma margem máxima (teto negociável).
 3. **Simulador de Comissão:** O corretor já vê na hora quanto vai tirar de honorários (5%, 6% tabela padrão do CRECI ou taxa personalizada).
 4. **Parecer Técnico com Justificativa:** Tópicos explicando por que o imóvel chegou naquele valor (impacto da idade, vagas extras, valorização do bairro), prontinho para imprimir ou levar para o cliente.
+
+---
+
+## 🗄️ De Onde Vieram os Nossos Datasets? (SP & SC)
+
+Na Sprint 1, a gente validou a base piloto de São Paulo. Agora na **Sprint 2**, atendendo à sugestão do orientador, expandimos a solução incluindo **Santa Catarina (SC)**, unificando uma base histórica com **12.500 registros de transações (2013 até 2026)**:
+
+* **São Paulo (SP - 7.500 registros):** Calibrados nas declarações de ITBI da Prefeitura de SP, GeoSampa e índices de mercado como FipeZAP.
+* **Santa Catarina (SC - 5.000 registros):** Cidades de destaque nacional em valorização imobiliária:
+  * **Balneário Camboriú:** Maior valor de metro quadrado do Brasil (Barra Sul, Centro, Pioneiros).
+  * **Itapema:** Segundo metro quadrado mais valorizado de SC (Meia Praia e Centro).
+  * **Florianópolis:** Capital catarinense (Jurerê Internacional, Campeche, Agronômica, Centro, Itacorubi).
+  * **Joinville e Blumenau:** Polos industriais, universitários e comerciais de alta densidade no estado.
+
+---
+
+## 🔬 Validação Cruzada (5-Fold Cross-Validation) & Comparativo Didático de 3 Modelos
+
+Para garantir rigor acadêmico e provar que o nosso modelo não estava com resultados enviesados por "sorte" em uma divisão simples de 80/20, adotamos **Validação Cruzada com 5 Dobras (5-Fold Cross-Validation)**.
+
+### 📚 O que é e por que usamos a Validação Cruzada (K-Fold 5)?
+Em vez de treinar uma única vez, a base de 12.500 registros é fatiada em 5 blocos iguais (folds) de 2.500 amostras cada:
+1. O algoritmo treina em 4 blocos (10.000 amostras) e é testado no bloco restante (2.500 amostras).
+2. O processo se repete 5 vezes, alternando o bloco de teste a cada rodada.
+3. As métricas finais são a média e o desvio padrão obtidos nas 5 rodadas ($\mu \pm \sigma$), provando a consistência real do aprendizado.
+
+---
+
+### 🤖 Os 3 Modelos Avaliados e Explicados Didaticamente
+
+Avaliamos três abordagens pedagógicas sobre os mesmos dados:
+
+| Modelo de Inteligência Artificial | Tipo / Família | R² Médio (%) | Desvio R² (±%) | Erro Médio (MAE em R$) | Erro Percentual (MAPE) | Tempo de Treino |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **Random Forest (Ensemble)** 🏆 | Ensemble (Bagging) | **89.11%** | **± 1.63%** | **R$ 197.551,32** | **16.96%** | **0.78s** |
+| **Regressão Linear (Ridge)** | Linear Regularizado | 86.33% | ± 1.01% | R$ 242.727,10 | 27.14% | 0.04s |
+| **Árvore de Decisão Simples** | Árvore de Decisão | 81.86% | ± 2.48% | R$ 243.911,24 | 20.60% | 0.06s |
+
+#### 1. Regressão Linear / Ridge (Baseline Clássico)
+* **Como funciona:** Modela o preço como uma soma ponderada direta dos atributos ($y = w_1 x_1 + \dots + w_n x_n + b$).
+* **Por que usamos:** Serve como o ponto de partida mínimo (baseline) da ciência de dados.
+* **O que aprendemos:** É ultrarrápida para treinar (0.04s), mas tem dificuldade com comportamentos não-lineares. Por exemplo, ela assume que o impacto de uma vaga de garagem é constante, ignorando que ter 2 vagas na Barra Sul (Balneário Camboriú) valoriza muito mais do que ter 2 vagas em um bairro periférico. Por isso, seu erro percentual ($MAPE$) foi o mais alto (27.14%).
+
+#### 2. Árvore de Decisão Simples (Decision Tree)
+* **Como funciona:** Divide os dados em regras condicionais (*"se bairro = Barra Sul e área > 100..."*).
+* **Por que usamos:** Para testar um modelo não-linear básico baseado em regras de negócio.
+* **O que aprendemos:** Consegue captar nichos e regras não-lineares, derrubando o erro percentual para 20.60%. Porém, por ser uma árvore solitária, ela oscila bastante dependendo da amostra (teve o maior desvio padrão entre as dobras: $\pm 2.48\%$), mostrando risco de overfitting.
+
+#### 3. Random Forest (Ensemble de Bagging — O Campeão)
+* **Como funciona:** Combina 100 árvores de decisão diferentes. Cada árvore é treinada com uma amostra aleatória dos dados e um subconjunto aleatório de variáveis. A predição final é a média de todas as árvores.
+* **Por que venceu:** A média de múltiplas árvores cancela os ruídos individuais. Ele alcançou o maior $R^2$ (**89.11%**), o menor erro médio em reais (**R$ 197.551**) e o menor erro percentual (**16.96%**), sendo escolhido como o modelo oficial para o sistema em produção.
 
 ---
 
@@ -25,50 +76,17 @@ O projeto está estruturado em **duas frentes** para a apresentação da banca/p
 
 1. 📓 **Jupyter Notebook Acadêmico (`CorretorIA_Apresentacao_PI6.ipynb`):**
    * Perfeito para mostrar o passo a passo da IA célula por célula ao professor:
-     * Carga dos dados e EDA (Análise Exploratória).
-     * Ranking e distribuição do valor do m² por bairro de São Paulo.
-     * Engenharia de atributos (`ColumnTransformer`, `OneHotEncoder`, `StandardScaler`).
-     * Treinamento do modelo `RandomForestRegressor`.
-     * Métricas de validação ($R^2 = 97.58\%$ e $MAPE = 9.63\%$).
-     * Simulador interativo em Python com impressão do parecer técnico.
+     * Carga dos dados unificados (12.500 registros de SP e SC).
+     * Análise Exploratória (ranking dos maiores m² de Balneário Camboriú, Itapema, Floripa e SP).
+     * Pré-processamento com `ColumnTransformer` (`OneHotEncoder` + `StandardScaler`).
+     * Execução da **Validação Cruzada (5-Fold Cross-Validation)** nos 3 modelos.
+     * Tabela comparativa e conclusões didáticas.
+     * Simulador interativo em Python testando imóveis em Moema (SP) e Balneário Camboriú (SC).
 
 2. 🌐 **Aplicação Web Interativa (FastAPI + Frontend Moderno):**
-   * Dashboard visual completo para simular em tempo real como um consultor usaria no dia a dia.
-   * Criamos o script **`executar_sistema.bat`** (basta dar 2 cliques para iniciar tudo e abrir o navegador automaticamente).
-
----
-
-## 🗄️ De Onde Veio o Nosso Dataset?
-
-Para treinar o nosso modelo, a gente utilizou uma base estruturada com **7.500 registros de transações imobiliárias da cidade de São Paulo**, abrangendo o período histórico de **2013 até 2026**.
-
-* **Origem e Referência dos Dados:** Os dados foram baseados e calibrados nos padrões públicos de transações imobiliárias e dados abertos da cidade de São Paulo (referências do ITBI da Prefeitura de SP, GeoSampa e índices de mercado como FipeZAP).
-* **Por que focamos só em São Paulo agora?**  
-  O nosso professor/orientador tinha sugerido a ideia de abranger o Brasil todo ou vários estados. Porém, conversando em grupo, decidimos que para a **primeira entrega** a prioridade era deixar o sistema redondo, consistente e com dados confiáveis. São Paulo é a maior praça imobiliária da América Latina e tem a maior densidade de dados limpos. 
-  Ainda assim, **a arquitetura do nosso código já foi feita pensando no Brasil todo**: o banco e a API já têm campos de `estado` e `cidade`, e a interface já conta com os botões de expansão (Minas Gerais, Santa Catarina, Rio de Janeiro), que serão as próximas bases a serem inseridas.
-
----
-
-## 🧠 Como Funciona a Inteligência Artificial? (Método e Algoritmo)
-
-Em vez de usar uma simples regra de três ou média estática de metro quadrado (que falha muito porque ignora se o imóvel tem vaga ou se é velho), a gente adotou uma abordagem de **Precificação Hedônica** usando Machine Learning.
-
-### 1. O Algoritmo Escolhido: *Random Forest Regressor*
-Optamos pelo algoritmo **Random Forest (Florestas Aleatórias)** da biblioteca `scikit-learn`:
-* **Por que não Regressão Linear Simples?** Porque o mercado de imóveis tem efeitos não-lineares. Por exemplo: ter 2 vagas em Moema agrega um valor desproporcionalmente maior do que ter 2 vagas em um bairro periférico; um imóvel recém-construído (0 a 3 anos) tem um prêmio de lançamento que cai com o tempo e depois estabiliza. O Random Forest consegue capturar essas combinações complexas com muita eficiência.
-
-### 2. Tratamento das Variáveis (*Feature Engineering*)
-Criamos um pipeline completo de pré-processamento com `ColumnTransformer`:
-* **Variáveis Categóricas (`bairro`, `tipo`):** Tratadas com `OneHotEncoder`, transformando os nomes dos bairros e tipos (Apartamento, Casa, Cobertura) em variáveis binárias interpretáveis pelo modelo.
-* **Variáveis Numéricas (`area_m2`, `idade_imovel`, `quartos`, `banheiros`, `vagas`):** Normalizadas com `StandardScaler` para balancear a escala de grandeza dos atributos.
-* **Cálculo da Idade:** O sistema recebe o `ano_construcao` e converte dinamicamente em `idade_imovel = 2026 - ano_construcao`.
-
-### 3. Como Chegamos na Faixa de Preço (Mínimo e Máximo)
-Para não dar apenas um valor seco, calculamos os resíduos do modelo no conjunto de dados. O Erro Médio Percentual ($MAPE$) do nosso modelo ficou em torno de **9.6%**, com um coeficiente de determinação **$R^2 = 0.9758$ (97.5% de acurácia explicada)**.  
-Com base nesse desvio padrão, criamos:
-* **Faixa Mínima (Liquidez):** ~9% a 10% abaixo do preço central (ótimo para proprietários com pressa de vender).
-* **Preço Justo (Alvo):** A predição pura da IA.
-* **Faixa Máxima (Teto):** ~10% a 11% acima do preço central (margem de "gordura" para abrir a negociação).
+   * Dashboard com alternância em 1 clique entre **São Paulo (SP)** e **Santa Catarina (SC)**.
+   * Seção visual de **Benchmark Científico** com tabela e cards explicativos dos modelos.
+   * Executável de 1 clique: **`executar_sistema.bat`**.
 
 ---
 
@@ -80,23 +98,27 @@ SI-PI6-2026-T012-CorretorIA/
 ├── executar_sistema.bat              # Script de 2 cliques para rodar tudo no laptop
 ├── data/
 │   ├── bairros_sp.json               # Lista dos bairros de SP com m² de referência
-│   └── dataset_sp_imoveis.csv        # Dataset com 7.500 registros de SP (2013-2026)
+│   ├── bairros_sc.json               # Lista das cidades/bairros de SC (BC, Floripa, Itapema, etc.)
+│   └── dataset_sp_imoveis.csv        # Dataset unificado com 12.500 registros (2013-2026)
 ├── ml/
 │   ├── __init__.py
-│   └── pricing_model.py              # Código do modelo de Machine Learning (Random Forest)
+│   ├── pricing_model.py              # Motor de inferência multi-estado (SP e SC)
+│   ├── model_benchmark.py            # Pipeline de validação cruzada K-Fold 5 e treino dos 3 modelos
+│   ├── benchmark_results.json        # Relatório de validação cruzada serializado
+│   └── saved_pricing_model.joblib    # Modelo campeão (Random Forest) serializado
 ├── notebooks/
 │   └── CorretorIA_Modelagem_e_Apresentacao.ipynb
 ├── scripts/
-│   ├── prepare_dataset.py            # Script para gerar/limpar a base
+│   ├── prepare_dataset.py            # Geração da base unificada SP + SC
 │   └── generate_notebook.py          # Script gerador do Jupyter Notebook
 ├── static/
-│   ├── index.html                    # Tela do corretor (HTML5 moderno)
-│   ├── styles.css                    # Estilo limpo e responsivo (CSS3)
-│   └── app.js                        # Conexão da tela com a API (JavaScript)
+│   ├── index.html                    # Interface web com seletor SP/SC e aba de benchmark
+│   ├── styles.css                    # Estilos modernos e responsivos
+│   └── app.js                        # Controlador JavaScript da aplicação
 ├── docs/
-│   └── PROPOSTA_PI6.md               # Proposta técnica detalhada para o professor
+│   └── PROPOSTA_PI6.md               # Documento técnico da proposta para a banca
 ├── tests/
-│   └── test_api.py                   # Testes automatizados do modelo e das rotas
+│   └── test_api.py                   # Suíte de 5 testes automatizados (SP, SC, Benchmark)
 ├── main.py                           # Backend em FastAPI
 ├── requirements.txt                  # Bibliotecas necessárias
 └── README.md                         # Este arquivo
@@ -104,40 +126,23 @@ SI-PI6-2026-T012-CorretorIA/
 
 ---
 
-## 🚀 Como Rodar no Notebook / Computador da Apresentação
+## 🚀 Como Rodar o Sistema
 
-### Opção A: Execução em 1 Clique (Aplicação Web Completa)
-Basta dar **dois cliques no arquivo `executar_sistema.bat`** na pasta do projeto!
-Ele vai:
-1. Checar o Python e as dependências;
-2. Iniciar o servidor local;
-3. Abrir o navegador automaticamente em [http://localhost:8000](http://localhost:8000).
-
----
+### Opção A: Execução em 1 Clique (Aplicação Web)
+Dê **dois cliques no arquivo `executar_sistema.bat`** na pasta do projeto.  
+O navegador abrirá automaticamente em [http://localhost:8000](http://localhost:8000).
 
 ### Opção B: Rodar o Jupyter Notebook da Apresentação
-Abra o arquivo **`CorretorIA_Apresentacao_PI6.ipynb`** no VS Code ou inicie o Jupyter com:
+Abra o arquivo **`CorretorIA_Apresentacao_PI6.ipynb`** no VS Code ou via terminal:
 ```bash
 jupyter notebook CorretorIA_Apresentacao_PI6.ipynb
 ```
-*(Ou arraste o arquivo `.ipynb` diretamente para o [Google Colab](https://colab.research.google.com/)).*
 
 ---
 
-### Opção C: Rodar Manualmente pelo Terminal
-```bash
-# 1. Instalar dependências
-pip install -r requirements.txt
+## 🔮 Próximos Passos (Sprints Futuras)
 
-# 2. Iniciar o servidor
-python main.py
-```
-
----
-
-## 🔮 Próximos Passos (Para as Próximas Sprints)
-
-* [ ] **Expansão Regional:** Adicionar os datasets de Minas Gerais (Belo Horizonte) e Santa Catarina (Florianópolis / Balneário Camboriú), atendendo à sugestão do orientador.
-* [ ] **Upload de Planilha Própria:** Permitir que imobiliárias subam seus próprios arquivos CSV com histórico da carteira para recalibrar o modelo.
-* [ ] **Mais Variáveis de Custo:** Incluir campos de valor estimado de condomínio e IPTU para refinar a atratividade do imóvel.
-* [ ] **Deploy em Nuvem:** Subir a aplicação gratuitamente no Render ou Railway com banco de dados em nuvem.
+* [x] **Sprint 1:** Base piloto de São Paulo (SP) e MVP funcional da precificação.
+* [x] **Sprint 2:** Expansão para Santa Catarina (SC), pipeline de validação cruzada 5-Fold e comparativo didático de 3 modelos de IA.
+* [ ] **Sprint 3:** Upload de planilha própria do corretor para recalibração local.
+* [ ] **Sprint 4:** Deploy público em nuvem (Render/Railway).

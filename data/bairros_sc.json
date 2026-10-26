@@ -1,0 +1,128 @@
+[
+  {
+    "id": "bc_barra_sul",
+    "cidade": "Balneário Camboriú",
+    "nome": "Barra Sul",
+    "zona": "Orla Sul",
+    "preco_m2_base": 20500,
+    "valorizacao_anual": 0.082,
+    "descricao": "Região dos maiores arranha-céus da América Latina, marinas de luxo e maior m² do Brasil."
+  },
+  {
+    "id": "bc_centro",
+    "cidade": "Balneário Camboriú",
+    "nome": "Centro",
+    "zona": "Orla Central",
+    "preco_m2_base": 16800,
+    "valorizacao_anual": 0.075,
+    "descricao": "Coração turístico de BC, com ampla faixa de areia alargada e altíssima liquidez de temporada."
+  },
+  {
+    "id": "bc_pioneiros",
+    "cidade": "Balneário Camboriú",
+    "nome": "Pioneiros",
+    "zona": "Orla Norte",
+    "preco_m2_base": 15200,
+    "valorizacao_anual": 0.071,
+    "descricao": "Bairro residencial nobre na extremidade norte da orla, próximo ao Pontal Norte e FG Big Wheel."
+  },
+  {
+    "id": "itapema_meia_praia",
+    "cidade": "Itapema",
+    "nome": "Meia Praia",
+    "zona": "Litoral Norte",
+    "preco_m2_base": 15400,
+    "valorizacao_anual": 0.085,
+    "descricao": "Um dos metros quadrados que mais se valorizam no país, com calçadão gastronômico e praias amplas."
+  },
+  {
+    "id": "itapema_centro",
+    "cidade": "Itapema",
+    "nome": "Centro",
+    "zona": "Litoral Norte",
+    "preco_m2_base": 12900,
+    "valorizacao_anual": 0.068,
+    "descricao": "Área tradicional da cidade com forte infraestrutura comercial e proximidade com a BR-101."
+  },
+  {
+    "id": "fln_jurere_internacional",
+    "cidade": "Florianópolis",
+    "nome": "Jurerê Internacional",
+    "zona": "Norte da Ilha",
+    "preco_m2_base": 18200,
+    "valorizacao_anual": 0.072,
+    "descricao": "Bairro planejado de padrão internacional, beach clubs renomados e altíssimo valor patrimonial."
+  },
+  {
+    "id": "fln_campeche",
+    "cidade": "Florianópolis",
+    "nome": "Campeche",
+    "zona": "Sul da Ilha",
+    "preco_m2_base": 12800,
+    "valorizacao_anual": 0.078,
+    "descricao": "Região em acelerada valorização impulsionada pelo novo aeroporto internacional e polo de novos moradores."
+  },
+  {
+    "id": "fln_agronomica",
+    "cidade": "Florianópolis",
+    "nome": "Agronômica",
+    "zona": "Região Central",
+    "preco_m2_base": 13900,
+    "valorizacao_anual": 0.062,
+    "descricao": "Localizado ao longo da Beira-Mar Norte, endereço residencial nobre tradicional da capital catarinense."
+  },
+  {
+    "id": "fln_centro",
+    "cidade": "Florianópolis",
+    "nome": "Centro",
+    "zona": "Região Central",
+    "preco_m2_base": 11800,
+    "valorizacao_anual": 0.055,
+    "descricao": "Polo financeiro, governamental e universitário da ilha com forte mercado de locação anual."
+  },
+  {
+    "id": "fln_itacorubi",
+    "cidade": "Florianópolis",
+    "nome": "Itacorubi",
+    "zona": "Leste da Ilha",
+    "preco_m2_base": 11200,
+    "valorizacao_anual": 0.059,
+    "descricao": "Polo tecnológico e acadêmico próximo à UFSC e UDESC, com grande atratividade para locação."
+  },
+  {
+    "id": "joinville_america",
+    "cidade": "Joinville",
+    "nome": "América",
+    "zona": "Região Central/Norte",
+    "preco_m2_base": 9200,
+    "valorizacao_anual": 0.052,
+    "descricao": "Bairro mais nobre da maior cidade do estado, com excelente arborização e residências de alto padrão."
+  },
+  {
+    "id": "joinville_atiradores",
+    "cidade": "Joinville",
+    "nome": "Atiradores",
+    "zona": "Região Central",
+    "preco_m2_base": 8900,
+    "valorizacao_anual": 0.050,
+    "descricao": "Região gastronômica nobre da cidade, com condomínios sofisticados e proximidade do centro."
+  },
+  {
+    "id": "blumenau_victor_konder",
+    "cidade": "Blumenau",
+    "nome": "Victor Konder",
+    "zona": "Vale do Itajaí",
+    "preco_m2_base": 8500,
+    "valorizacao_anual": 0.048,
+    "descricao": "Bairro nobre e universitário com ampla oferta gastronômica e proximidade da FURB."
+  },
+  {
+    "id": "blumenau_centro",
+    "cidade": "Blumenau",
+    "nome": "Centro",
+    "zona": "Vale do Itajaí",
+    "preco_m2_base": 7800,
+    "valorizacao_anual": 0.045,
+    "descricao": "Polo comercial e histórico às margens do Rio Itajaí-Açu com forte preservação cultural germânica."
+  }
+]

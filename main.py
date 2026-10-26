@@ -1,12 +1,12 @@
 """
 API Backend - Sistema de Precificação Imobiliária com IA
-Projeto Integrador 6 - SI-PI6-2026-T012
+Projeto Integrador 6 - SI-PI6-2026-T012 - Sprint 2 (SP & SC)
 """
 
 import os
 from contextlib import asynccontextmanager
 from typing import Optional, List
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -16,7 +16,6 @@ from ml.pricing_model import engine, DATASET_PATH
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Inicializa e carrega o modelo preditivo
     print("[API] Inicializando motor de Inteligência Artificial...")
     engine.train_or_load()
     yield
@@ -24,8 +23,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="CorretorIA - Inteligência de Precificação Imobiliária (SI-PI6)",
-    description="Sistema inteligente de apoio à decisão e precificação para corretores de imóveis.",
-    version="1.0.0",
+    description="Sistema inteligente de apoio à decisão e precificação para corretores (São Paulo & Santa Catarina).",
+    version="2.0.0",
     lifespan=lifespan
 )
 
@@ -39,8 +38,9 @@ app.add_middleware(
 
 
 class PropertyPredictionRequest(BaseModel):
-    estado: str = Field(default="SP", description="Sigla do estado (Ex: SP)")
-    bairro: str = Field(..., description="Nome do bairro em São Paulo")
+    estado: str = Field(default="SP", description="Sigla do estado (SP ou SC)")
+    cidade: Optional[str] = Field(default=None, description="Nome da cidade")
+    bairro: str = Field(..., description="Nome do bairro")
     tipo: str = Field(default="Apartamento", description="Apartamento, Casa ou Cobertura")
     area_m2: float = Field(..., gt=10, lt=2000, description="Área útil em m²")
     ano_construcao: int = Field(..., ge=1950, le=2026, description="Ano de construção do imóvel")
@@ -55,59 +55,83 @@ def health_check():
     return {
         "status": "online",
         "modulo_ia": "operacional",
-        "versao": "1.0.0-sprint1",
+        "versao": "2.0.0-sprint2",
+        "estados_suportados": ["SP", "SC"],
         "metricas": engine.metrics
     }
 
 
 @app.get("/api/locations")
-def get_locations():
+def get_locations(estado: Optional[str] = Query(default=None, description="Filtrar por UF (SP ou SC)")):
     """
     Retorna os estados suportados e os bairros disponíveis.
-    Demonstra a arquitetura multi-estado com SP ativo e MG/SC no roadmap.
+    Agora com São Paulo (SP) e Santa Catarina (SC) ATIVOS!
     """
-    bairros_sp = engine.get_available_bairros()
+    bairros_sp = engine.get_available_bairros("SP")
+    bairros_sc = engine.get_available_bairros("SC")
+
+    estados_info = [
+        {
+            "uf": "SP",
+            "nome": "São Paulo",
+            "status": "ativo",
+            "total_bairros": len(bairros_sp),
+            "descricao": "Base Homologada (Capital Paulista)"
+        },
+        {
+            "uf": "SC",
+            "nome": "Santa Catarina",
+            "status": "ativo",
+            "total_bairros": len(bairros_sc),
+            "descricao": "Base Homologada (Balneário Camboriú, Floripa, Itapema, etc.)"
+        },
+        {
+            "uf": "MG",
+            "nome": "Minas Gerais",
+            "status": "em_breve",
+            "total_bairros": 0,
+            "descricao": "Fase 3 do Roadmap (Belo Horizonte e Região)"
+        },
+        {
+            "uf": "RJ",
+            "nome": "Rio de Janeiro",
+            "status": "em_breve",
+            "total_bairros": 0,
+            "descricao": "Fase 3 do Roadmap (Capital e Niterói)"
+        }
+    ]
+
+    if estado:
+        uf = estado.upper()
+        if uf == "SC":
+            bairros_retorno = sorted(bairros_sc, key=lambda x: f"{x.get('cidade','')}_{x['nome']}")
+        else:
+            bairros_retorno = sorted(bairros_sp, key=lambda x: x["nome"])
+    else:
+        bairros_retorno = sorted(bairros_sp + bairros_sc, key=lambda x: x["nome"])
+
     return {
-        "estados": [
-            {
-                "uf": "SP",
-                "nome": "São Paulo",
-                "status": "ativo",
-                "total_bairros": len(bairros_sp),
-                "descricao": "Base Piloto Ativa - Modelo Preditivo Homologado"
-            },
-            {
-                "uf": "MG",
-                "nome": "Minas Gerais",
-                "status": "em_breve",
-                "total_bairros": 0,
-                "descricao": "Fase 2 do Roadmap (Belo Horizonte e Região)"
-            },
-            {
-                "uf": "SC",
-                "nome": "Santa Catarina",
-                "status": "em_breve",
-                "total_bairros": 0,
-                "descricao": "Fase 2 do Roadmap (Florianópolis, Balneário Camboriú)"
-            },
-            {
-                "uf": "RJ",
-                "nome": "Rio de Janeiro",
-                "status": "em_breve",
-                "total_bairros": 0,
-                "descricao": "Fase 3 do Roadmap (Capital e Niterói)"
-            }
-        ],
-        "bairros": sorted(bairros_sp, key=lambda x: x["nome"])
+        "estados": estados_info,
+        "bairros": bairros_retorno
     }
+
+
+@app.get("/api/benchmark")
+def get_benchmark():
+    """
+    Retorna os resultados didáticos da Validação Cruzada (5-Fold)
+    comparando os 3 modelos: Regressão Linear, Árvore de Decisão e Random Forest.
+    """
+    return engine.get_benchmark_results()
 
 
 @app.post("/api/predict")
 def predict_price(req: PropertyPredictionRequest):
-    if req.estado.upper() != "SP":
+    estado_uf = req.estado.upper()
+    if estado_uf not in ["SP", "SC"]:
         raise HTTPException(
             status_code=400,
-            detail=f"O estado '{req.estado}' está planejado para a Fase 2 de expansão. No momento, o modelo atende São Paulo (SP)."
+            detail=f"O estado '{req.estado}' ainda não está homologado. Estados ativos: SP e SC."
         )
 
     try:
@@ -120,7 +144,8 @@ def predict_price(req: PropertyPredictionRequest):
             banheiros=req.banheiros,
             vagas=req.vagas,
             margem_corretor_pct=req.margem_corretor_pct or 6.0,
-            estado=req.estado.upper()
+            estado=estado_uf,
+            cidade=req.cidade
         )
         return resultado
     except Exception as e:
@@ -128,15 +153,15 @@ def predict_price(req: PropertyPredictionRequest):
 
 
 @app.get("/api/market-summary")
-def market_summary():
-    """
-    Retorna métricas consolidadas do mercado de São Paulo para o dashboard do corretor.
-    """
+def market_summary(estado: Optional[str] = Query(default="SP", description="Estado para filtrar métricas")):
     if not os.path.exists(DATASET_PATH):
         return {"total_amostras": 0, "media_preco_m2": 0, "ranking_bairros": []}
 
     df = pd.read_csv(DATASET_PATH)
-    resumo_bairros = df.groupby("bairro").agg(
+    uf = (estado or "SP").upper()
+    df_estado = df[df["estado"] == uf] if uf in ["SP", "SC"] else df
+
+    resumo_bairros = df_estado.groupby(["cidade", "bairro"]).agg(
         preco_m2_medio=("preco_m2", "mean"),
         preco_medio=("preco", "mean"),
         amostras=("id", "count")
@@ -147,9 +172,11 @@ def market_summary():
     resumo_bairros = resumo_bairros.sort_values(by="preco_m2_medio", ascending=False)
 
     return {
-        "total_registros_base": len(df),
-        "media_geral_m2": round(float(df["preco_m2"].mean()), 2),
-        "idade_media_imoveis": round(float(df["idade_imovel"].mean()), 1),
+        "estado": uf,
+        "total_registros_base": len(df_estado),
+        "total_registros_geral": len(df),
+        "media_geral_m2": round(float(df_estado["preco_m2"].mean()), 2),
+        "idade_media_imoveis": round(float(df_estado["idade_imovel"].mean()), 1),
         "ranking_bairros": resumo_bairros.to_dict(orient="records")
     }
 
