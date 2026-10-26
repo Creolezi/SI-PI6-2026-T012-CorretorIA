@@ -3,6 +3,8 @@
 > Projeto Integrador VI (SI-PI6-2026-T012)  
 > Curso: Sistemas de Informação • Sprint 2 (SP & SC + Validação Cruzada)
 
+[![Abrir no Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Creolezi/SI-PI6-2026-T012-CorretorIA/blob/main/CorretorIA_Apresentacao_PI6.ipynb)
+
 ---
 
 ## 📌 Sobre o Projeto
