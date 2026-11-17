@@ -1,7 +1,7 @@
 # CorretorIA - Sistema de Precificação Imobiliária com Inteligência Artificial
 
 > Projeto Integrador VI (SI-PI6-2026-T012)  
-> Curso: Sistemas de Informação • Sprint 2 (SP & SC + Validação Cruzada)
+> Curso: Sistemas de Informação • Sprint 3 (GridSearchCV, Teste Cru 10%, XGBoost, Rede Neural MLP & Estimação Futura)
 
 [![Abrir no Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Creolezi/SI-PI6-2026-T012-CorretorIA/blob/main/CorretorIA_Apresentacao_PI6.ipynb)
 
@@ -11,84 +11,60 @@
 
 A gente pensou nesse projeto para resolver uma dor real que quase todo corretor e consultor imobiliário enfrenta no dia a dia: **como precificar um imóvel com segurança e rapidez sem cair na ilusão do proprietário ou desvalorizar o imóvel.**
 
-Na maioria das vezes, o proprietário quer colocar o preço lá em cima porque tem apego emocional, enquanto o comprador quer pagar o mínimo possível. Se o corretor erra a mão na avaliação, o imóvel fica "encalhado" meses no mercado, gerando custo e frustração. 
-
-O nosso sistema, batizado de **CorretorIA**, é uma ferramenta prática para o consultor imobiliário. Ele entra no sistema, seleciona o estado (São Paulo ou Santa Catarina), preenche os dados do imóvel (bairro, metragem, ano de construção, quartos, banheiros, vagas) e o algoritmo calcula:
-1. **Preço Justo Central:** Valor médio de mercado sugerido com base nos padrões históricos.
-2. **Faixa de Negociação:** Uma margem mínima (para venda rápida/liquidez) e uma margem máxima (teto negociável).
-3. **Simulador de Comissão:** O corretor já vê na hora quanto vai tirar de honorários (5%, 6% tabela padrão do CRECI ou taxa personalizada).
-4. **Parecer Técnico com Justificativa:** Tópicos explicando por que o imóvel chegou naquele valor (impacto da idade, vagas extras, valorização do bairro), prontinho para imprimir ou levar para o cliente.
+O nosso sistema, batizado de **CorretorIA**, ajuda o consultor imobiliário a avaliar imóveis de **São Paulo (SP)** e **Santa Catarina (SC)** com embasamento estatístico, entregando:
+1. **Preço Justo Central:** Valor de mercado estimado pelo modelo campeão.
+2. **Faixa de Negociação:** Margem mínima (liquidez rápida) e teto negociável.
+3. **Estimação de Futuro (2027–2030):** Projeção de quanto o imóvel tende a valorizar nos próximos 4 anos.
+4. **Simulador de Comissão:** Cálculo direto dos honorários do consultor (6% padrão CRECI ou personalizado).
+5. **Parecer Técnico Explicativo:** Fatores que mais influenciaram o valor do imóvel.
 
 ---
 
 ## 🗄️ De Onde Vieram os Nossos Datasets? (SP & SC)
 
-Na Sprint 1, a gente validou a base piloto de São Paulo. Agora na **Sprint 2**, atendendo à sugestão do orientador, expandimos a solução incluindo **Santa Catarina (SC)**, unificando uma base histórica com **12.500 registros de transações (2013 até 2026)**:
-
-* **São Paulo (SP - 7.500 registros):** Calibrados nas declarações de ITBI da Prefeitura de SP, GeoSampa e índices de mercado como FipeZAP.
-* **Santa Catarina (SC - 5.000 registros):** Cidades de destaque nacional em valorização imobiliária:
-  * **Balneário Camboriú:** Maior valor de metro quadrado do Brasil (Barra Sul, Centro, Pioneiros).
-  * **Itapema:** Segundo metro quadrado mais valorizado de SC (Meia Praia e Centro).
-  * **Florianópolis:** Capital catarinense (Jurerê Internacional, Campeche, Agronômica, Centro, Itacorubi).
-  * **Joinville e Blumenau:** Polos industriais, universitários e comerciais de alta densidade no estado.
+Unificamos uma base histórica com **12.500 registros de transações (2013 até 2026)**:
+* **São Paulo (SP - 7.500 registros):** Calibrados nos padrões públicos do ITBI da Prefeitura de SP, GeoSampa e índices de mercado (FipeZAP).
+* **Santa Catarina (SC - 5.000 registros):** Principais polos do estado (Balneário Camboriú — Barra Sul, Centro e Pioneiros —, Itapema — Meia Praia e Centro —, Florianópolis — Jurerê Internacional, Campeche, Agronômica, Centro e Itacorubi —, Joinville e Blumenau).
 
 ---
 
-## 🔬 Validação Cruzada (5-Fold Cross-Validation) & Comparativo Didático de 3 Modelos
+## 📈 Variação Anual (2013–2026) & Estimação de Futuro (2027–2030)
 
-Para garantir rigor acadêmico e provar que o nosso modelo não estava com resultados enviesados por "sorte" em uma divisão simples de 80/20, adotamos **Validação Cruzada com 5 Dobras (5-Fold Cross-Validation)**.
-
-### 📚 O que é e por que usamos a Validação Cruzada (K-Fold 5)?
-Em vez de treinar uma única vez, a base de 12.500 registros é fatiada em 5 blocos iguais (folds) de 2.500 amostras cada:
-1. O algoritmo treina em 4 blocos (10.000 amostras) e é testado no bloco restante (2.500 amostras).
-2. O processo se repete 5 vezes, alternando o bloco de teste a cada rodada.
-3. As métricas finais são a média e o desvio padrão obtidos nas 5 rodadas ($\mu \pm \sigma$), provando a consistência real do aprendizado.
+Para atender às discussões da última aula:
+1. **Plot separado por ano (`ano_transacao`):** Separamos as transações de **2013 até 2026** para visualizar claramente como o preço médio e a variação do m² evoluíram ano a ano em São Paulo e em Santa Catarina.
+2. **Estimação de Futuro (2027–2030):** Ajustamos uma tendência temporal sobre a série histórica anual de cada estado (com faixa de confiança) e aplicamos a taxa de valorização regional no simulador para estimar o valor futuro do imóvel em **2027, 2028, 2029 e 2030**.
 
 ---
 
-### 🤖 Os 3 Modelos Avaliados e Explicados Didaticamente
+## 🧪 Ambiente de Teste Isolado (Hold-out 10% Cru) & `GridSearchCV`
 
-Avaliamos três abordagens pedagógicas sobre os mesmos dados:
+Na etapa anterior avaliávamos os modelos diretamente com validação cruzada e parâmetros fixos. Nesta entrega evoluímos o rigor metodológico:
 
-| Modelo de Inteligência Artificial | Tipo / Família | R² Médio (%) | Desvio R² (±%) | Erro Médio (MAE em R$) | Erro Percentual (MAPE) | Tempo de Treino |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Random Forest (Ensemble)** 🏆 | Ensemble (Bagging) | **89.11%** | **± 1.63%** | **R$ 197.551,32** | **16.96%** | **0.78s** |
-| **Regressão Linear (Ridge)** | Linear Regularizado | 86.33% | ± 1.01% | R$ 242.727,10 | 27.14% | 0.04s |
-| **Árvore de Decisão Simples** | Árvore de Decisão | 81.86% | ± 2.48% | R$ 243.911,24 | 20.60% | 0.06s |
-
-#### 1. Regressão Linear / Ridge (Baseline Clássico)
-* **Como funciona:** Modela o preço como uma soma ponderada direta dos atributos ($y = w_1 x_1 + \dots + w_n x_n + b$).
-* **Por que usamos:** Serve como o ponto de partida mínimo (baseline) da ciência de dados.
-* **O que aprendemos:** É ultrarrápida para treinar (0.04s), mas tem dificuldade com comportamentos não-lineares. Por exemplo, ela assume que o impacto de uma vaga de garagem é constante, ignorando que ter 2 vagas na Barra Sul (Balneário Camboriú) valoriza muito mais do que ter 2 vagas em um bairro periférico. Por isso, seu erro percentual ($MAPE$) foi o mais alto (27.14%).
-
-#### 2. Árvore de Decisão Simples (Decision Tree)
-* **Como funciona:** Divide os dados em regras condicionais (*"se bairro = Barra Sul e área > 100..."*).
-* **Por que usamos:** Para testar um modelo não-linear básico baseado em regras de negócio.
-* **O que aprendemos:** Consegue captar nichos e regras não-lineares, derrubando o erro percentual para 20.60%. Porém, por ser uma árvore solitária, ela oscila bastante dependendo da amostra (teve o maior desvio padrão entre as dobras: $\pm 2.48\%$), mostrando risco de overfitting.
-
-#### 3. Random Forest (Ensemble de Bagging — O Campeão)
-* **Como funciona:** Combina 100 árvores de decisão diferentes. Cada árvore é treinada com uma amostra aleatória dos dados e um subconjunto aleatório de variáveis. A predição final é a média de todas as árvores.
-* **Por que venceu:** A média de múltiplas árvores cancela os ruídos individuais. Ele alcançou o maior $R^2$ (**89.11%**), o menor erro médio em reais (**R$ 197.551**) e o menor erro percentual (**16.96%**), sendo escolhido como o modelo oficial para o sistema em produção.
+1. **Separação de 10% do Dataset "Cru" (`Hold-out`):**
+   * Antes de qualquer ajuste ou busca de hiperparâmetros, **tiramos 10% do dataset bruto (1.250 imóveis)** de forma estratificada por estado (`SP` e `SC`) e deixamos esse bloco totalmente de lado.
+   * Assim, o modelo vencedor nunca teve contato com esses dados, garantindo uma avaliação cega sem nenhum viés.
+2. **Busca de Hiperparâmetros com `GridSearchCV` (5-Fold nos 90% restantes):**
+   * Em vez de testar apenas um conjunto fixo de parâmetros, usamos os **90% restantes (11.250 imóveis)** dentro do `GridSearchCV(cv=5)` para variar os hiperparâmetros em grade de todos os modelos e escolher automaticamente a melhor configuração de cada um.
 
 ---
 
-## 💻 Formatos de Apresentação para o Professor
+## 🤖 Comparativo dos 5 Modelos (incluindo `XGBoost` e `Rede Neural MLP`)
 
-O projeto está estruturado em **duas frentes** para a apresentação da banca/professor:
+Todas as métricas abaixo foram calculadas para cada modelo otimizado pelo `GridSearchCV` e avaliadas no **conjunto de teste cru de 10% (1.250 imóveis inéditos)**:
 
-1. 📓 **Jupyter Notebook Acadêmico (`CorretorIA_Apresentacao_PI6.ipynb`):**
-   * Perfeito para mostrar o passo a passo da IA célula por célula ao professor:
-     * Carga dos dados unificados (12.500 registros de SP e SC).
-     * Análise Exploratória (ranking dos maiores m² de Balneário Camboriú, Itapema, Floripa e SP).
-     * Pré-processamento com `ColumnTransformer` (`OneHotEncoder` + `StandardScaler`).
-     * Execução da **Validação Cruzada (5-Fold Cross-Validation)** nos 3 modelos.
-     * Tabela comparativa e conclusões didáticas.
-     * Simulador interativo em Python testando imóveis em Moema (SP) e Balneário Camboriú (SC).
+| Modelo de IA | Melhores Parâmetros (`GridSearchCV`) | R² CV (90%) | R² Teste Cru (10%) | MAE (Teste Cru) | MAPE (Teste Cru) | RMSE (Teste Cru) | Tempo |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Rede Neural MLP** 🏆 | `{'alpha': 0.001, 'hidden_layer_sizes': [64, 32], 'learning_rate_init': 0.005}` | **98.61%** | **98.77%** | **R$ 75.144,29** | **6.24%** | **R$ 132.956,46** | 15.50s |
+| **XGBoost** | `{'learning_rate': 0.1, 'max_depth': 5, 'n_estimators': 150}` | 96.45% | 95.57% | R$ 94.471,28 | 7.02% | R$ 252.241,68 | 4.98s |
+| **Random Forest** | `{'max_depth': 16, 'min_samples_split': 4, 'n_estimators': 120}` | 91.59% | 91.68% | R$ 159.587,28 | 12.41% | R$ 345.499,69 | 29.55s |
+| **Regressão Linear (Ridge)** | `{'alpha': 1.0}` | 89.02% | 87.58% | R$ 220.306,01 | 26.17% | R$ 422.186,50 | 4.05s |
+| **Árvore de Decisão** | `{'max_depth': 16, 'min_samples_split': 10}` | 83.87% | 83.96% | R$ 215.849,67 | 16.30% | R$ 479.909,58 | 0.69s |
 
-2. 🌐 **Aplicação Web Interativa (FastAPI + Frontend Moderno):**
-   * Dashboard com alternância em 1 clique entre **São Paulo (SP)** e **Santa Catarina (SC)**.
-   * Seção visual de **Benchmark Científico** com tabela e cards explicativos dos modelos.
-   * Executável de 1 clique: **`executar_sistema.bat`**.
+### O que a gente concluiu comparando os 5 modelos:
+* **Árvore de Decisão & Regressão Linear (Ridge):** São rápidos, mas erram mais nas combinações de bairros nobres, metragem e ano da transação (`MAPE` de 16.30% e 26.17%).
+* **Random Forest:** Reduz bastante o erro combinando múltiplas árvores em paralelo (`R² = 91.68%` no teste cru), mas ainda sofre um pouco em extremos de luxo.
+* **XGBoost:** O boosting sequencial dá um salto enorme, derrubando o erro médio para `7.02%` e batendo `95.57%` de $R^2$ em apenas ~5 segundos.
+* **Rede Neural MLP (Campeã):** Usando um Perceptron Multicamadas com escalonamento do alvo (`TransformedTargetRegressor` + `StandardScaler`), ela captou perfeitamente o comportamento contínuo dos preços ao longo dos anos e venceu no teste cru com **`98.77%` de $R^2$** e **`6.24%` de MAPE**!
 
 ---
 
@@ -96,55 +72,55 @@ O projeto está estruturado em **duas frentes** para a apresentação da banca/p
 
 ```text
 SI-PI6-2026-T012-CorretorIA/
-├── CorretorIA_Apresentacao_PI6.ipynb # Jupyter Notebook para apresentar ao professor
-├── executar_sistema.bat              # Script de 2 cliques para rodar tudo no laptop
+├── CorretorIA_Apresentacao_PI6.ipynb # Notebook completo para o Google Colab
+├── executar_sistema.bat              # Script de 2 cliques para rodar tudo no Windows
 ├── data/
-│   ├── bairros_sp.json               # Lista dos bairros de SP com m² de referência
-│   ├── bairros_sc.json               # Lista das cidades/bairros de SC (BC, Floripa, Itapema, etc.)
-│   └── dataset_sp_imoveis.csv        # Dataset unificado com 12.500 registros (2013-2026)
+│   ├── bairros_sp.json               # Bairros e índices base de SP
+│   ├── bairros_sc.json               # Cidades/bairros e índices base de SC
+│   └── dataset_sp_imoveis.csv        # Base histórica integrada (12.500 registros, 2013-2026)
 ├── ml/
 │   ├── __init__.py
-│   ├── pricing_model.py              # Motor de inferência multi-estado (SP e SC)
-│   ├── model_benchmark.py            # Pipeline de validação cruzada K-Fold 5 e treino dos 3 modelos
-│   ├── benchmark_results.json        # Relatório de validação cruzada serializado
-│   └── saved_pricing_model.joblib    # Modelo campeão (Random Forest) serializado
+│   ├── pricing_model.py              # Motor de inferência e estimação de futuro (2027-2030)
+│   ├── model_benchmark.py            # Hold-out 10% cru, GridSearchCV (5 modelos) e série anual
+│   ├── benchmark_results.json        # Métricas salvas do GridSearchCV e teste cru
+│   └── saved_pricing_model.joblib    # Modelo campeão salvo (Rede Neural MLP)
 ├── notebooks/
 │   └── CorretorIA_Modelagem_e_Apresentacao.ipynb
 ├── scripts/
-│   ├── prepare_dataset.py            # Geração da base unificada SP + SC
-│   └── generate_notebook.py          # Script gerador do Jupyter Notebook
+│   ├── prepare_dataset.py            # Geração e limpeza da base SP + SC
+│   └── generate_notebook.py          # Gerador automático do Notebook do Google Colab
 ├── static/
-│   ├── index.html                    # Interface web com seletor SP/SC e aba de benchmark
-│   ├── styles.css                    # Estilos modernos e responsivos
-│   └── app.js                        # Controlador JavaScript da aplicação
+│   ├── index.html                    # Interface web (SP/SC, estimação futura, benchmark 5 modelos)
+│   ├── styles.css                    # Estilos modernos
+│   └── app.js                        # Integração com a API
 ├── docs/
-│   └── PROPOSTA_PI6.md               # Documento técnico da proposta para a banca
+│   └── PROPOSTA_PI6.md               # Documento técnico acadêmico
 ├── tests/
-│   └── test_api.py                   # Suíte de 5 testes automatizados (SP, SC, Benchmark)
-├── main.py                           # Backend em FastAPI
-├── requirements.txt                  # Bibliotecas necessárias
+│   └── test_api.py                   # Suíte de 6 testes automatizados
+├── main.py                           # API FastAPI (v3.0.0)
+├── requirements.txt                  # Dependências (inclui xgboost e matplotlib)
 └── README.md                         # Este arquivo
 ```
 
 ---
 
-## 🚀 Como Rodar o Sistema
+## 🚀 Como Rodar
 
-### Opção A: Execução em 1 Clique (Aplicação Web)
-Dê **dois cliques no arquivo `executar_sistema.bat`** na pasta do projeto.  
-O navegador abrirá automaticamente em [http://localhost:8000](http://localhost:8000).
+### Opção 1: Direto no Google Colab (Apresentação em Aula)
+Clique no link abaixo para abrir direto na nuvem sem instalar nada:  
+👉 **[Abrir no Google Colab](https://colab.research.google.com/github/Creolezi/SI-PI6-2026-T012-CorretorIA/blob/main/CorretorIA_Apresentacao_PI6.ipynb)**
 
-### Opção B: Rodar o Jupyter Notebook da Apresentação
-Abra o arquivo **`CorretorIA_Apresentacao_PI6.ipynb`** no VS Code ou via terminal:
+### Opção 2: Aplicação Web Local (1 Clique no Windows)
+1. Dê dois cliques em `executar_sistema.bat` na pasta do projeto.
+2. Ou rode no terminal:
+   ```bash
+   pip install -r requirements.txt
+   python main.py
+   ```
+   Acesse **[http://localhost:8000](http://localhost:8000)** (e documentação Swagger em `/docs`).
+
+### Opção 3: Re-executar o Pipeline de GridSearchCV e Testes
 ```bash
-jupyter notebook CorretorIA_Apresentacao_PI6.ipynb
+python ml/model_benchmark.py
+python tests/test_api.py
 ```
-
----
-
-## 🔮 Próximos Passos (Sprints Futuras)
-
-* [x] **Sprint 1:** Base piloto de São Paulo (SP) e MVP funcional da precificação.
-* [x] **Sprint 2:** Expansão para Santa Catarina (SC), pipeline de validação cruzada 5-Fold e comparativo didático de 3 modelos de IA.
-* [ ] **Sprint 3:** Upload de planilha própria do corretor para recalibração local.
-* [ ] **Sprint 4:** Deploy público em nuvem (Render/Railway).

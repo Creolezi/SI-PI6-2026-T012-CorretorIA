@@ -957,6 +957,208 @@ input[type="range"] {
   line-height: 1.45;
 }
 
+.didactic-tag.boost { background: #dbeafe; color: #1d4ed8; }
+
+.didactic-grid-5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+@media (max-width: 1120px) {
+  .didactic-grid-5 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .didactic-grid-5 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.params-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.72rem;
+  background: #f1f5f9;
+  color: #334155;
+  padding: 3px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  max-width: 240px;
+  word-break: break-word;
+}
+
+/* Estimação de Futuro (2027-2030) no Card de Resultado */
+.future-box {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.future-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 12px;
+}
+
+.future-rate-badge {
+  background: #dbeafe;
+  color: #1d4ed8;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.future-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .future-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.future-card {
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: var(--radius-sm);
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.future-year {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.future-val {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #1e3a8a;
+}
+
+.future-gain {
+  display: inline-block;
+  margin-top: 3px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #059669;
+  background: #ecfdf5;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+/* Série Histórica Anual (2013-2026) e Estimação Futura (2027-2030) */
+.yearly-trends-section {
+  margin-top: 32px;
+}
+
+.yearly-bars-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 220px;
+  padding: 28px 8px 8px;
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+}
+
+.year-bar-item {
+  flex: 1;
+  min-width: 42px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.year-bar-val {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #334155;
+  white-space: nowrap;
+}
+
+.year-bar-track {
+  width: 100%;
+  max-width: 34px;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.year-bar-fill {
+  width: 100%;
+  border-radius: 6px 6px 0 0;
+  transition: height 0.35s ease;
+}
+
+.bar-hist {
+  background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+}
+
+.bar-fut {
+  background: repeating-linear-gradient(
+    45deg,
+    #10b981,
+    #10b981 5px,
+    #34d399 5px,
+    #34d399 10px
+  );
+  border: 1px dashed #047857;
+}
+
+.year-bar-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.year-bar-label.is-fut {
+  color: #059669;
+  font-weight: 800;
+}
+
+.yearly-legend {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 14px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 10px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.swatch-hist { background: #2563eb; }
+.swatch-fut { background: #10b981; border: 1px dashed #047857; }
+
 /* Rodapé */
 .app-footer {
   border-top: 1px solid var(--border-color);

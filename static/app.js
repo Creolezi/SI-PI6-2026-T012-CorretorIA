@@ -54,9 +54,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const resComissaoJusto = document.getElementById("res-comissao-justo");
   const resComissaoMin = document.getElementById("res-comissao-min");
   const resComissaoMax = document.getElementById("res-comissao-max");
+  const resTaxaValorizacao = document.getElementById("res-taxa-valorizacao");
+  const futureGrid = document.getElementById("future-grid");
   const resFatoresList = document.getElementById("res-fatores-list");
 
-  // Elementos de Benchmark / Mercado
+  // Elementos de Tendência Anual / Mercado
+  const yearlyTitleText = document.getElementById("yearly-title-text");
+  const yearlyBarsContainer = document.getElementById("yearly-bars-container");
   const statTotalAmostras = document.getElementById("stat-total-amostras");
   const statMediaM2 = document.getElementById("stat-media-m2");
   const statR2Score = document.getElementById("stat-r2-score");
@@ -77,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     await loadLocations();
     await loadMarketSummary();
     await loadBenchmarkResults();
+    await loadYearlyTrends();
   }
 
   function setupEventListeners() {
@@ -95,14 +100,17 @@ document.addEventListener("DOMContentLoaded", () => {
           lblEstadoAtivo.textContent = "Santa Catarina (SC)";
           labelBairroTitulo.textContent = "Bairro / Cidade (Santa Catarina)";
           marketTitleText.textContent = "Panorama Imobiliário — Santa Catarina (FipeZAP)";
+          yearlyTitleText.textContent = "Variação Anual (2013–2026) & Estimação de Futuro (2027–2030) — SC";
         } else {
           lblEstadoAtivo.textContent = "São Paulo (SP)";
           labelBairroTitulo.textContent = "Bairro (São Paulo)";
           marketTitleText.textContent = "Panorama Imobiliário — São Paulo (Capital)";
+          yearlyTitleText.textContent = "Variação Anual (2013–2026) & Estimação de Futuro (2027–2030) — SP";
         }
 
         await loadLocations();
         await loadMarketSummary();
+        await loadYearlyTrends();
       });
     });
 
@@ -293,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Carrega Resultados da Validação Cruzada K-Fold (Benchmark dos 3 Modelos)
+  // Carrega Resultados do GridSearchCV (90%) + Teste Cru Isolado (10%) para os 5 Modelos
   async function loadBenchmarkResults() {
     try {
       const res = await fetch("/api/benchmark");
@@ -308,22 +316,26 @@ document.addEventListener("DOMContentLoaded", () => {
           const isWinner = m.id === data.modelo_campeao;
           if (isWinner) tr.classList.add("benchmark-winner-row");
 
+          const paramsText = m.melhores_parametros
+            ? Object.entries(m.melhores_parametros).map(([k, v]) => `${k}: ${JSON.stringify(v)}`).join(", ")
+            : "-";
+
           tr.innerHTML = `
             <td>
               <strong>${m.nome}</strong>
-              <div style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">${m.descricao_didatica.substring(0, 75)}...</div>
+              <div style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">${m.tipo} • ${m.combinacoes_grid || 1} comb. x 5 folds</div>
             </td>
-            <td><span class="badge-academic">${m.tipo}</span></td>
+            <td><span class="params-code">${paramsText}</span></td>
+            <td><strong>${m.r2_cv_pct || m.r2_pct}%</strong></td>
             <td>
-              <strong style="color: ${isWinner ? '#16a34a' : '#1e293b'}">${m.r2_pct}%</strong> 
-              <span style="font-size: 0.72rem; color: #94a3b8;">(± ${(m.r2_std * 100).toFixed(1)}%)</span>
+              <strong style="color: ${isWinner ? '#16a34a' : '#1e293b'}">${m.r2_pct}%</strong>
             </td>
             <td>${formatCurrency(m.mae_medio)}</td>
             <td><strong>${m.mape_medio_pct}%</strong></td>
             <td>${m.tempo_treino_seg}s</td>
             <td>
               ${isWinner 
-                ? '<span class="badge-rank-winner">🏆 Campeão (Melhor R²)</span>' 
+                ? '<span class="badge-rank-winner">🏆 Campeão (Teste Cru)</span>' 
                 : `<span class="badge-rank-sub">${idx + 1}º Lugar</span>`}
             </td>
           `;
@@ -338,6 +350,51 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } catch (err) {
       console.warn("Falha ao carregar benchmark:", err);
+    }
+  }
+
+  // Carrega Série Histórica Anual (2013-2026) & Estimação de Futuro (2027-2030)
+  async function loadYearlyTrends() {
+    if (!yearlyBarsContainer) return;
+    try {
+      const res = await fetch(`/api/yearly-trends?estado=${state.selectedUf}`);
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const hist = (data.historico_anual || []).map((d) => ({
+        ano: d.ano,
+        valor: d.preco_m2_medio,
+        isFuturo: false
+      }));
+      const fut = (data.estimacao_futuro || []).map((d) => ({
+        ano: d.ano,
+        valor: d.preco_m2_estimado,
+        isFuturo: true
+      }));
+
+      const todosAnos = [...hist, ...fut];
+      if (todosAnos.length === 0) return;
+
+      const maxVal = Math.max(...todosAnos.map((x) => x.valor));
+      yearlyBarsContainer.innerHTML = "";
+
+      todosAnos.forEach((item) => {
+        const pct = maxVal > 0 ? Math.max(15, Math.round((item.valor / maxVal) * 100)) : 20;
+        const barDiv = document.createElement("div");
+        barDiv.className = "year-bar-item";
+        barDiv.title = `${item.ano}: ${formatCurrency(item.valor)}/m² ${item.isFuturo ? "(Estimação Futura)" : "(Histórico)"}`;
+
+        barDiv.innerHTML = `
+          <span class="year-bar-val">${(item.valor / 1000).toFixed(1)}k</span>
+          <div class="year-bar-track">
+            <div class="year-bar-fill ${item.isFuturo ? "bar-fut" : "bar-hist"}" style="height: ${pct}%;"></div>
+          </div>
+          <span class="year-bar-label ${item.isFuturo ? "is-fut" : ""}">${item.ano}</span>
+        `;
+        yearlyBarsContainer.appendChild(barDiv);
+      });
+    } catch (err) {
+      console.warn("Falha ao carregar tendência anual:", err);
     }
   }
 
@@ -434,6 +491,25 @@ document.addEventListener("DOMContentLoaded", () => {
     resComissaoJusto.textContent = formatCurrency(comm.comissao_valor_justo);
     resComissaoMin.textContent = formatCurrency(comm.comissao_faixa_min);
     resComissaoMax.textContent = formatCurrency(comm.comissao_faixa_max);
+
+    // Estimação de Futuro (2027-2030)
+    if (futureGrid && res.estimativa_futuro) {
+      const fut = res.estimativa_futuro;
+      if (resTaxaValorizacao) {
+        resTaxaValorizacao.textContent = `+${fut.taxa_valorizacao_anual_pct.toFixed(1)}% a.a.`;
+      }
+      futureGrid.innerHTML = "";
+      (fut.projecoes || []).forEach((p) => {
+        const card = document.createElement("div");
+        card.className = "future-card";
+        card.innerHTML = `
+          <span class="future-year">${p.ano}</span>
+          <span class="future-val">${formatCurrency(p.valor_estimado)}</span>
+          <span class="future-gain">+${p.valorizacao_acumulada_pct}%</span>
+        `;
+        futureGrid.appendChild(card);
+      });
+    }
 
     // Fatores de Explicabilidade
     resFatoresList.innerHTML = "";

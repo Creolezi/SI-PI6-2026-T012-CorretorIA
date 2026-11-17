@@ -63,9 +63,9 @@ class RealEstatePricingEngine:
             print(f"[ML] Modelo carregado! {self.metrics.get('model_name', 'Random Forest')} - R²: {self.metrics.get('r2', 0):.4f}")
             return
 
-        print("[ML] Executando benchmark completo para treino do modelo...")
-        from ml.model_benchmark import run_kfold_benchmark
-        run_kfold_benchmark(n_splits=5)
+        print("[ML] Executando pipeline GridSearchCV (5-Fold) com Hold-out 10% cru...")
+        from ml.model_benchmark import run_gridsearch_benchmark
+        run_gridsearch_benchmark(cv_folds=5, test_size=0.10)
         self.train_or_load(force_retrain=False)
 
     def predict(
@@ -79,7 +79,8 @@ class RealEstatePricingEngine:
         vagas: int,
         margem_corretor_pct: float = 6.0,
         estado: str = "SP",
-        cidade: str = None
+        cidade: str = None,
+        ano_transacao: int = 2026
     ) -> Dict[str, Any]:
         if self.model is None:
             self.train_or_load()
@@ -103,7 +104,8 @@ class RealEstatePricingEngine:
             "idade_imovel": idade_imovel,
             "quartos": quartos,
             "banheiros": banheiros,
-            "vagas": vagas
+            "vagas": vagas,
+            "ano_transacao": min(ano_transacao, 2026)
         }])
 
         pred_price = float(self.model.predict(input_df)[0])
@@ -126,6 +128,23 @@ class RealEstatePricingEngine:
         # Preço de referência do m²
         preco_m2_base = bairro_meta.get("preco_m2_base", preco_m2)
         diferencial_m2 = ((preco_m2 / preco_m2_base) - 1.0) * 100.0 if preco_m2_base > 0 else 0.0
+
+        # Estimação de futuro (2027 a 2030) baseada na taxa de valorização anual regional
+        taxa_valorizacao = bairro_meta.get(
+            "valorizacao_anual",
+            0.072 if estado == "SC" else 0.052
+        )
+        estimativa_futuro = []
+        for idx, ano_fut in enumerate([2027, 2028, 2029, 2030], start=1):
+            fator_composto = (1.0 + taxa_valorizacao) ** idx
+            valor_fut = round(preco_justo * fator_composto, 2)
+            preco_m2_fut = round(valor_fut / area_m2, 2) if area_m2 > 0 else 0.0
+            estimativa_futuro.append({
+                "ano": ano_fut,
+                "valor_estimado": valor_fut,
+                "preco_m2_estimado": preco_m2_fut,
+                "valorizacao_acumulada_pct": round((fator_composto - 1.0) * 100.0, 1)
+            })
 
         # Explicabilidade
         explicabilidade = self._generate_explanation(
@@ -160,6 +179,10 @@ class RealEstatePricingEngine:
                 "preco_m2": round(preco_m2, 2),
                 "preco_m2_referencia_bairro": round(preco_m2_base, 2),
                 "diferencial_m2_pct": round(diferencial_m2, 1)
+            },
+            "estimativa_futuro": {
+                "taxa_valorizacao_anual_pct": round(taxa_valorizacao * 100.0, 2),
+                "projecoes": estimativa_futuro
             },
             "honorarios_corretor": {
                 "taxa_pct": round(margem_corretor_pct, 1),

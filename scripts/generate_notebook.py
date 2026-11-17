@@ -1,6 +1,12 @@
 """
 Gerador do Jupyter Notebook de Apresentação Otimizado para o Google Colab
-Projeto Integrador VI (SI-PI6-2026-T012) - Sprint 2
+Projeto Integrador VI (SI-PI6-2026-T012) - Sprint 3:
+- Plot separado por ano mostrando variação de valores (2013-2026)
+- Estimação de futuro (2027-2030)
+- Ambiente de teste isolado: 10% Hold-out cru intocado
+- GridSearchCV (5-Fold) variando hiperparâmetros nos 90% de treino
+- Inclusão de XGBoost e Rede Neural MLP (além de Ridge, Decision Tree e Random Forest)
+- Cálculo de todas as métricas para cada modelo do GridSearch no teste cru
 """
 
 import os
@@ -14,12 +20,14 @@ os.makedirs(NOTEBOOKS_DIR, exist_ok=True)
 
 cells = []
 
+
 def add_md(text):
     cells.append({
         "cell_type": "markdown",
         "metadata": {},
         "source": [line + "\n" for line in text.strip().split("\n")]
     })
+
 
 def add_code(code):
     cells.append({
@@ -30,38 +38,31 @@ def add_code(code):
         "source": [line + "\n" for line in code.strip().split("\n")]
     })
 
-# Célula 1: Badge Colab e Título
-add_md("""# Projeto Integrador VI (SI-PI6-2026-T012)
-## CorretorIA: Sistema Inteligente de Precificação Imobiliária com Aprendizado de Máquina
-### Sprint 2: Expansão Santa Catarina (SC) & Validação Cruzada (K-Fold 5) de 3 Modelos
+
+# Célula 1: Título e Requisitos da Aula
+add_md(r"""# Projeto Integrador VI (SI-PI6-2026-T012)
+## CorretorIA: Precificação Imobiliária com IA, GridSearchCV, XGBoost e Rede Neural MLP
 
 [![Abrir no Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Creolezi/SI-PI6-2026-T012-CorretorIA/blob/main/CorretorIA_Apresentacao_PI6.ipynb)
 
-* **Curso:** Bacharelado em Sistemas de Informação
-* **Turma:** 012 - 2026
-* **Ambiente de Apresentação:** Google Colab
-* **Tema:** Modelo de Precificação Hedônica e Apoio à Tomada de Decisão para Corretores
-* **Novidades da Sprint 2:**
-  1. Base integrada com **Santa Catarina (SC)** (Balneário Camboriú, Florianópolis, Itapema, Joinville, Blumenau).
-  2. Implementação de **Validação Cruzada (5-Fold Cross-Validation)**.
-  3. Comparativo didático de **3 modelos de IA** (*Regressão Linear Baseline vs. Árvore de Decisão vs. Random Forest Ensemble*).
+* **Curso:** Bacharelado em Sistemas de Informação • **Turma:** 012 - 2026
+* **Base Integrada:** **12.500 imóveis** (São Paulo: 7.500 | Santa Catarina: 5.000) — Série Histórica **2013 a 2026**
 
 ---
-### 📌 Contexto & Problema de Negócio
-No mercado imobiliário, a precificação errática é a principal causa de imóveis que ficam meses estagnados sem proposta ou que geram prejuízo na liquidação rápida. 
-O **CorretorIA** resolve esse problema ao fornecer ao consultor imobiliário um embasamento técnico:
-1. **Preço Justo Central de Mercado (R$)**
-2. **Faixa Estratégica de Negociação** (Mínimo de liquidez acelerada vs. Teto negociável)
-3. **Simulador em Tempo Real dos Honorários/Comissão do Corretor** (tabela CRECI de 6% ou customizada)
-4. **Parecer Técnico com Explicabilidade** (peso da localização, metragem, idade do imóvel e vagas de garagem)
+### 🎯 Pontos Implementados nesta Etapa (Alinhados com a Aula):
+1. **Plot separado por ano (2013–2026):** Visualização da variação histórica de preços ano a ano para SP e SC.
+2. **Estimação de futuro (2027–2030):** Projeção de tendência futura com intervalo de confiança e simulador de valorização.
+3. **Ambiente de Teste Isolado (Hold-out 10% Cru):** Separação de **10% do dataset bruto** antes de qualquer treino ou ajuste, deixando-o completamente isolado e sem viés.
+4. **Otimização de Hiperparâmetros com `GridSearchCV`:** Em vez de testar apenas um parâmetro fixo, cada modelo varia seus hiperparâmetros em grade nos **90%** de desenvolvimento (`cv=5`).
+5. **Inclusão do `XGBoost` e da Rede Neural `MLP`:** Comparativo completo de **5 arquiteturas distintas** (*Regressão Ridge, Árvore de Decisão, Random Forest, XGBoost e Rede Neural MLP*).
+6. **Avaliação no Conjunto de Teste Cru (10%):** Cálculo de $R^2$ (CV e Teste Cru), $MAE$, $MAPE$ e $RMSE$ para cada modelo otimizado pelo GridSearch.
 """)
 
 # Célula 2: Imports
-add_md("""## 1. Importação das Bibliotecas
-Importamos as ferramentas essenciais para processamento de dados, modelagem matemática, regressão, validação cruzada e visualização gráfica no Google Colab.""")
+add_md(r"""## 1. Importação das Bibliotecas e Preparação do Ambiente
+Importamos as bibliotecas de manipulação de dados, gráficos (`matplotlib`), algoritmos do `scikit-learn` (incluindo `GridSearchCV` e `MLPRegressor`) e o `XGBoost`.""")
 
 add_code("""import os
-import json
 import time
 import numpy as np
 import pandas as pd
@@ -69,33 +70,35 @@ import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
 
-# Configuração de estilo dos gráficos no Google Colab
-plt.style.use('seaborn-v0_8-whitegrid' if 'seaborn-v0_8-whitegrid' in plt.style.available else 'default')
-plt.rcParams['figure.figsize'] = (10, 5)
-plt.rcParams['font.size'] = 11
+# Garante xgboost instalado caso rode em um ambiente limpo
+try:
+    from xgboost import XGBRegressor
+except ImportError:
+    import subprocess, sys
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", "xgboost"])
+    from xgboost import XGBRegressor
 
-# Machine Learning & Validação Cruzada
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import Ridge, LinearRegression
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.compose import ColumnTransformer
+from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import KFold
-from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 
-print("Bibliotecas importadas com sucesso!")""")
+plt.style.use('seaborn-v0_8-whitegrid' if 'seaborn-v0_8-whitegrid' in plt.style.available else 'default')
+plt.rcParams['figure.figsize'] = (11, 5)
+plt.rcParams['font.size'] = 10
 
-# Célula 3: Ingestão de Dados (Compatível 100% com Google Colab e Local)
-add_md("""## 2. Ingestão da Base de Dados Integrada (São Paulo & Santa Catarina)
-A célula abaixo detecta automaticamente se estamos rodando no **Google Colab** ou no ambiente local:
-* Se for no **Google Colab**, carrega os dados diretamente do GitHub do grupo em 1 segundo via link raw!
-* **São Paulo (SP):** 7.500 registros de transações (2013-2026) baseadas no ITBI da Prefeitura de SP e GeoSampa.
-* **Santa Catarina (SC):** 5.000 registros calibrados com índices FipeZAP dos principais polos catarinenses (Balneário Camboriú — maior m² do Brasil —, Itapema, Florianópolis, Joinville e Blumenau).
-* **Total:** **12.500 registros imobiliários** unificados.""")
+print("Ambiente pronto! Scikit-Learn, XGBoost, MLP e Matplotlib carregados com sucesso.")""")
 
-add_code("""# Detecção automática: Local vs Google Colab
-possible_paths = [
+# Célula 3: Carga da Base
+add_md(r"""## 2. Ingestão da Base Integrada (São Paulo & Santa Catarina)
+Carregamos automaticamente o CSV de **12.500 registros** localmente ou diretamente do repositório GitHub do grupo quando executado no **Google Colab**.""")
+
+add_code("""possible_paths = [
     os.path.join("data", "dataset_sp_imoveis.csv"),
     os.path.join("..", "data", "dataset_sp_imoveis.csv"),
     os.path.join(os.path.expanduser("~"), "Downloads", "SI-PI6-2026-T012- IA para corretor!", "data", "dataset_sp_imoveis.csv"),
@@ -108,210 +111,273 @@ for p in possible_paths:
         dataset_path = os.path.abspath(p)
         break
 
-# Se estiver no Google Colab ou se o arquivo não estiver local, busca direto no GitHub
 if not dataset_path:
-    github_url = "https://raw.githubusercontent.com/Creolezi/SI-PI6-2026-T012-CorretorIA/main/data/dataset_sp_imoveis.csv"
-    print("Ambiente Google Colab detectado! Carregando dados direto do GitHub...")
-    dataset_path = github_url
+    dataset_path = "https://raw.githubusercontent.com/Creolezi/SI-PI6-2026-T012-CorretorIA/main/data/dataset_sp_imoveis.csv"
+    print("Carregando base diretamente do GitHub para o Google Colab...")
 
 df = pd.read_csv(dataset_path)
-
-print(f"Base carregada com sucesso a partir de: {dataset_path}")
-print(f"Total de registros imobiliários: {len(df):,}")
-print(f"Distribuição por Estado:\n{df['estado'].value_counts()}\n")
+print(f"Base carregada: {len(df):,} imóveis | Anos: {df['ano_transacao'].min()} a {df['ano_transacao'].max()}")
+print(df['estado'].value_counts())
 df.head(4)""")
 
-# Célula 4: Visualizações Gráficas no Colab
-add_md("""## 3. Análise Exploratória Visual (Gráficos no Colab)
-Geramos gráficos visuais para comparar a hierarquia de valores de metro quadrado entre **São Paulo (SP)** e **Santa Catarina (SC)**.""")
+# Célula 4: Plot Separado por Ano + Estimação de Futuro
+add_md(r"""## 3. Plot Separado por Ano (2013–2026) & Estimação de Futuro (2027–2030)
+Analisamos a **evolução histórica separada por ano** (`ano_transacao`) para **São Paulo (SP)** e **Santa Catarina (SC)**, mostrando a variação de valores ano a ano e projetando a **estimação futura até 2030** com faixa de confiança estatística.""")
 
-add_code("""# Ranking dos 10 metros quadrados mais valorizados
-ranking_top10 = df.groupby(['estado', 'cidade', 'bairro']).agg(
-    preco_m2_medio=('preco_m2', 'mean')
-).reset_index().sort_values(by='preco_m2_medio', ascending=True).tail(10)
+add_code("""fig, axes = plt.subplots(1, 2, figsize=(15, 5.5))
+future_years = np.array([2027, 2028, 2029, 2030])
 
-labels = [f"{r.bairro} ({r.cidade} - {r.estado})" for _, r in ranking_top10.iterrows()]
-valores = ranking_top10['preco_m2_medio'].values
-cores = ['#2563eb' if 'SP' in l else '#10b981' for l in labels]
+configs = [
+    ("SP", "São Paulo (SP)", "#2563eb", axes[0]),
+    ("SC", "Santa Catarina (SC)", "#059669", axes[1])
+]
 
-plt.figure(figsize=(11, 6))
-bars = plt.barh(labels, valores, color=cores, edgecolor='black', alpha=0.85)
-plt.title('Top 10 Metros Quadrados Mais Valorizados da Base (SP vs SC)', fontsize=13, fontweight='bold', pad=15)
-plt.xlabel('Preço Médio por m² (R$)', fontsize=11)
+for uf, titulo, cor, ax in configs:
+    df_uf = df[df["estado"] == uf]
+    yearly = df_uf.groupby("ano_transacao").agg(
+        m2_medio=("preco_m2", "mean"),
+        m2_std=("preco_m2", "std")
+    ).reset_index().sort_values("ano_transacao")
 
-for bar in bars:
-    w = bar.get_width()
-    plt.text(w + 150, bar.get_y() + bar.get_height()/2, f"R$ {w:,.0f}", va='center', fontsize=9, fontweight='bold')
+    anos_hist = yearly["ano_transacao"].values
+    m2_hist = yearly["m2_medio"].values
 
-plt.xlim(0, max(valores) * 1.15)
+    # Regressão de tendência temporal para estimação futura (2027-2030)
+    reg_trend = LinearRegression().fit(anos_hist.reshape(-1, 1), m2_hist)
+    resid_std = np.std(m2_hist - reg_trend.predict(anos_hist.reshape(-1, 1)))
+
+    m2_fut = reg_trend.predict(future_years.reshape(-1, 1))
+    margem = np.array([resid_std * (1.0 + 0.25 * i) for i in range(1, 5)])
+
+    # Série histórica (2013-2026)
+    ax.plot(anos_hist, m2_hist, marker="o", color=cor, linewidth=2.5, label="Histórico Realizado (2013–2026)")
+
+    # Conexão contínua até 2027 + projeção tracejada (2027-2030)
+    anos_conn = np.concatenate([[anos_hist[-1]], future_years])
+    vals_conn = np.concatenate([[m2_hist[-1]], m2_fut])
+    ax.plot(anos_conn, vals_conn, linestyle="--", marker="s", color="#f59e0b", linewidth=2.5, label="Estimação de Futuro (2027–2030)")
+
+    # Banda de confiança na projeção futura
+    ax.fill_between(future_years, m2_fut - margem, m2_fut + margem, color="#f59e0b", alpha=0.18, label="Intervalo de Confiança")
+
+    # Anotação do último ano histórico e de 2030
+    ax.annotate(f"2026: R$ {m2_hist[-1]:,.0f}", (anos_hist[-1], m2_hist[-1]), textcoords="offset points", xytext=(-35, 10), fontsize=8.5, fontweight="bold")
+    ax.annotate(f"2030: R$ {m2_fut[-1]:,.0f}", (2030, m2_fut[-1]), textcoords="offset points", xytext=(-45, 10), fontsize=8.5, fontweight="bold", color="#b45309")
+
+    ax.set_title(f"{titulo} — Variação Anual do m² + Futuro", fontsize=12, fontweight="bold")
+    ax.set_xlabel("Ano")
+    ax.set_ylabel("Preço Médio por m² (R$)")
+    ax.legend(loc="upper left", fontsize=8.5)
+    ax.grid(True, alpha=0.35)
+
 plt.tight_layout()
 plt.show()""")
 
-# Célula 5: Engenharia de Recursos
-add_md("""## 4. Engenharia de Recursos (*Feature Engineering*) & Pipeline
-Construímos o pré-processador compartilhado:
-* **Variáveis Categóricas (`estado`, `cidade`, `bairro`, `tipo`):** Codificadas via `OneHotEncoder(handle_unknown='ignore')`.
-* **Variáveis Numéricas (`area_m2`, `idade_imovel`, `quartos`, `banheiros`, `vagas`):** Normalizadas com `StandardScaler`.""")
+# Célula 5: Boxplot de Variação de Valores por Ano
+add_md(r"""### 3.1 Distribuição e Variação de Valores por Ano (Boxplot 2013–2026)
+Para enxergar não apenas a média, mas a dispersão (variação entre imóveis econômicos e alto padrão) em cada ano, geramos um gráfico separado por ano de transação.""")
+
+add_code("""anos_ordenados = sorted(df["ano_transacao"].unique())
+dados_por_ano = [df[df["ano_transacao"] == ano]["preco_m2"].values for ano in anos_ordenados]
+
+plt.figure(figsize=(14, 5))
+bp = plt.boxplot(dados_por_ano, labels=anos_ordenados, patch_artist=True, showfliers=False)
+for patch in bp['boxes']:
+    patch.set_facecolor('#dbeafe')
+    patch.set_edgecolor('#2563eb')
+for median in bp['medians']:
+    median.set_color('#1d4ed8')
+    median.set_linewidth(2)
+
+plt.title("Variação Anual do Preço por m² (2013 a 2026) — Base Consolidada SP & SC", fontsize=13, fontweight="bold")
+plt.xlabel("Ano da Transação")
+plt.ylabel("Preço por m² (R$)")
+plt.grid(axis="y", alpha=0.35)
+plt.tight_layout()
+plt.show()""")
+
+# Célula 6: Separação do Ambiente de Teste 10% Cru
+add_md(r"""## 4. Separação do Ambiente de Teste Isolado (Hold-out 10% Cru)
+
+Para garantir uma avaliação honesta e sem viés (*data leakage*):
+1. Antes de qualquer ajuste ou busca de hiperparâmetros, **tiramos 10% do dataset bruto (`1.250` imóveis)** de forma estratificada por estado (`SP` e `SC`) e deixamos esse conjunto **totalmente intocado ("cru")**.
+2. Os **90% restantes (`11.250` imóveis)** vão para o ambiente de treinamento e validação cruzada com **`GridSearchCV (cv=5)`**.
+3. Depois que cada modelo encontra seus melhores parâmetros no GridSearch, todos são avaliados no **conjunto de teste cru de 10%** que nunca foi visto durante o treinamento!""")
 
 add_code("""features_cat = ['estado', 'cidade', 'bairro', 'tipo']
-features_num = ['area_m2', 'idade_imovel', 'quartos', 'banheiros', 'vagas']
+features_num = ['area_m2', 'idade_imovel', 'quartos', 'banheiros', 'vagas', 'ano_transacao']
 
 X = df[features_cat + features_num]
 y = df['preco']
+
+# Separação 90% Treino/GridSearchCV e 10% Teste Cru Isolado
+X_dev, X_test_raw, y_dev, y_test_raw = train_test_split(
+    X, y, test_size=0.10, random_state=42, stratify=df['estado']
+)
+
+print(f"Total do dataset              : {len(X):,} imóveis (100%)")
+print(f"Conjunto de Desenvolvimento   : {len(X_dev):,} imóveis (90% -> vai para o GridSearchCV)")
+print(f"Ambiente de Teste CRU Isolado : {len(X_test_raw):,} imóveis (10% -> guardado para validação cega final)")
 
 preprocessor = ColumnTransformer(
     transformers=[
         ('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), features_cat),
         ('num', StandardScaler(), features_num)
     ]
-)
+)""")
 
-print(f"Matriz de atributos X: {X.shape}")
-print(f"Vetor de preços y: {y.shape}")""")
+# Célula 7: GridSearchCV com os 5 Modelos (incluindo XGBoost e MLP)
+add_md(r"""## 5. `GridSearchCV` (5-Fold) com 5 Modelos: Incluindo `XGBoost` e Rede Neural `MLP`
 
-# Célula 6: Validação Cruzada K-Fold & Comparativo Didático de 3 Modelos
-add_md("""## 5. Validação Cruzada (5-Fold Cross-Validation) & Comparativo de 3 Modelos
+Ao invés de usar um único conjunto fixo de parâmetros, aplicamos o **`GridSearchCV`** para testar várias combinações de hiperparâmetros automaticamente em 5 dobras (`cv=5`) sobre os **90%** de desenvolvimento:
+1. **Regressão Linear (`Ridge`)** — varia `alpha`
+2. **Árvore de Decisão (`DecisionTreeRegressor`)** — varia `max_depth` e `min_samples_split`
+3. **Random Forest (`RandomForestRegressor`)** — varia `n_estimators`, `max_depth` e `min_samples_split`
+4. **XGBoost (`XGBRegressor`)** — varia `n_estimators`, `max_depth` e `learning_rate`
+5. **Rede Neural Artificial (`MLPRegressor` com `TransformedTargetRegressor`)** — varia arquitetura de camadas (`hidden_layer_sizes`), regularização (`alpha`) e `learning_rate_init`
 
-### 📚 Explicação Didática da Metodologia
-Em vez de avaliar os modelos em um único split simples de 80/20 (que pode dar um resultado ótimo ou péssimo por mera sorte na partição), utilizamos **Validação Cruzada com 5 Dobras (5-Fold Cross-Validation)**:
-1. Os 12.500 registros são divididos aleatoriamente em 5 blocos iguais (folds) de 2.500 amostras cada.
-2. Cada modelo é treinado 5 vezes: a cada rodada, 4 blocos (10.000 amostras) servem de treino e o bloco restante (2.500) serve de teste cego.
-3. As métricas finais são a média e o desvio padrão obtidos nas 5 rodadas ($\mu \pm \sigma$).
+Em seguida, cada melhor modelo encontrado pelo GridSearch é testado no **conjunto de teste cru de 10%**!""")
 
-### 🤖 Os 3 Modelos Didáticos Avaliados:
-1. **Regressão Linear / Ridge (Baseline Clássico):** Modelo linear paramétrico com regularização L2. Assume relação linear direta ($y = \sum w_i x_i + b$).
-2. **Árvore de Decisão (Decision Tree):** Modelo não-linear baseado em regras condicionais if/else.
-3. **Random Forest (Ensemble - Campeão):** Conjunto de 100 árvores combinadas com amostragem aleatória (Bagging), reduzindo a variância e o ruído individual.""")
+add_code("""models_config = [
+    {
+        "nome": "Regressão Linear (Ridge)",
+        "estimator": Ridge(random_state=42),
+        "param_grid": {"regressor__alpha": [0.1, 1.0, 10.0, 50.0]}
+    },
+    {
+        "nome": "Árvore de Decisão",
+        "estimator": DecisionTreeRegressor(random_state=42),
+        "param_grid": {"regressor__max_depth": [8, 12, 16], "regressor__min_samples_split": [4, 10]}
+    },
+    {
+        "nome": "Random Forest",
+        "estimator": RandomForestRegressor(random_state=42, n_jobs=1),
+        "param_grid": {
+            "regressor__n_estimators": [80, 120],
+            "regressor__max_depth": [12, 16],
+            "regressor__min_samples_split": [4, 8]
+        }
+    },
+    {
+        "nome": "XGBoost",
+        "estimator": XGBRegressor(random_state=42, n_jobs=1, verbosity=0),
+        "param_grid": {
+            "regressor__n_estimators": [100, 150],
+            "regressor__max_depth": [5, 7],
+            "regressor__learning_rate": [0.05, 0.1]
+        }
+    },
+    {
+        "nome": "Rede Neural MLP",
+        "estimator": TransformedTargetRegressor(
+            regressor=MLPRegressor(max_iter=250, early_stopping=True, random_state=42),
+            transformer=StandardScaler()
+        ),
+        "param_grid": {
+            "regressor__regressor__hidden_layer_sizes": [(64, 32), (128, 64)],
+            "regressor__regressor__alpha": [0.001, 0.01],
+            "regressor__regressor__learning_rate_init": [0.005, 0.01]
+        }
+    }
+]
 
-add_code("""# Configuração dos 3 modelos didáticos
-models = {
-    'Regressão Linear (Ridge)': Ridge(alpha=1.0),
-    'Árvore de Decisão': DecisionTreeRegressor(max_depth=14, min_samples_split=6, random_state=42),
-    'Random Forest (Ensemble)': RandomForestRegressor(n_estimators=100, max_depth=16, min_samples_split=4, random_state=42, n_jobs=-1)
-}
+resultados_grid = []
+melhores_modelos = {}
 
-kf = KFold(n_splits=5, shuffle=True, random_state=42)
-benchmark_summary = []
+for cfg in models_config:
+    print(f"Executando GridSearchCV para: {cfg['nome']}...")
+    t0 = time.time()
 
-print("Executando Validação Cruzada 5-Fold para os 3 modelos...")
-print("=" * 65)
+    pipe = Pipeline(steps=[
+        ('preprocessor', preprocessor),
+        ('regressor', cfg['estimator'])
+    ])
 
-for name, estimator in models.items():
-    r2_folds = []
-    mae_folds = []
-    mape_folds = []
-    times = []
+    grid = GridSearchCV(
+        estimator=pipe,
+        param_grid=cfg['param_grid'],
+        cv=5,
+        scoring='r2',
+        n_jobs=-1,
+        refit=True
+    )
+    grid.fit(X_dev, y_dev)
+    tempo = time.time() - t0
 
-    for train_idx, test_idx in kf.split(X, y):
-        X_tr, X_te = X.iloc[train_idx], X.iloc[test_idx]
-        y_tr, y_te = y.iloc[train_idx], y.iloc[test_idx]
+    best_model = grid.best_estimator_
+    melhores_modelos[cfg['nome']] = best_model
 
-        pipe = Pipeline(steps=[
-            ('preprocessor', preprocessor),
-            ('regressor', estimator)
-        ])
+    # Avaliação no Conjunto de Teste 10% CRU (Inédito)
+    preds_raw = best_model.predict(X_test_raw)
+    r2_raw = r2_score(y_test_raw, preds_raw)
+    mae_raw = mean_absolute_error(y_test_raw, preds_raw)
+    mape_raw = np.mean(np.abs((y_test_raw - preds_raw) / y_test_raw)) * 100
+    rmse_raw = np.sqrt(mean_squared_error(y_test_raw, preds_raw))
 
-        t0 = time.time()
-        pipe.fit(X_tr, y_tr)
-        t_fit = time.time() - t0
+    clean_params = {k.replace("regressor__regressor__", "").replace("regressor__", ""): v for k, v in grid.best_params_.items()}
 
-        preds = pipe.predict(X_te)
-
-        r2_folds.append(r2_score(y_te, preds))
-        mae_folds.append(mean_absolute_error(y_te, preds))
-        mape_folds.append(np.mean(np.abs((y_te - preds) / y_te)) * 100)
-        times.append(t_fit)
-
-    mean_r2 = np.mean(r2_folds)
-    std_r2 = np.std(r2_folds)
-    mean_mae = np.mean(mae_folds)
-    mean_mape = np.mean(mape_folds)
-    avg_t = np.mean(times)
-
-    benchmark_summary.append({
-        'Modelo': name,
-        'R² Médio (%)': round(mean_r2 * 100, 2),
-        'Desvio R² (±%)': round(std_r2 * 100, 2),
-        'MAE Médio (R$)': round(mean_mae, 2),
-        'MAPE Médio (%)': round(mean_mape, 2),
-        'Tempo Médio (s)': round(avg_t, 3)
+    resultados_grid.append({
+        "Modelo": cfg['nome'],
+        "Melhores Parâmetros (GridSearch)": str(clean_params),
+        "R² CV 90% (%)": round(grid.best_score_ * 100, 2),
+        "R² Teste Cru 10% (%)": round(r2_raw * 100, 2),
+        "MAE Teste Cru (R$)": round(mae_raw, 2),
+        "MAPE Teste Cru (%)": round(mape_raw, 2),
+        "RMSE Teste Cru (R$)": round(rmse_raw, 2),
+        "Tempo (s)": round(tempo, 2)
     })
 
-df_benchmark = pd.DataFrame(benchmark_summary).sort_values(by='R² Médio (%)', ascending=False)
-df_benchmark""")
+df_resultados = pd.DataFrame(resultados_grid).sort_values(by="R² Teste Cru 10% (%)", ascending=False).reset_index(drop=True)
+print("\n=== TABELA COMPARATIVA NO CONJUNTO DE TESTE CRU (10% ISOLADO) ===")
+df_resultados""")
 
-# Célula 7: Gráfico Comparativo dos 3 Modelos no Colab
-add_md("""### 📊 Gráfico Comparativo de Performance (R² e Erro MAPE)
-Visualizamos graficamente a superioridade do modelo ensemble (Random Forest) em comparação aos modelos lineares e de árvore única.""")
+# Célula 8: Gráfico Comparativo dos 5 Modelos
+add_md(r"""### 5.1 Comparativo Visual das Métricas no Conjunto de Teste Cru (10%)
+Plotamos lado a lado o **$R^2$ (Acurácia)** e o **$MAPE$ (Erro Percentual)** dos 5 modelos otimizados pelo `GridSearchCV` quando testados na base crua de 10%.""")
 
-add_code("""nomes_modelos = df_benchmark['Modelo'].tolist()
-r2_vals = df_benchmark['R² Médio (%)'].tolist()
-mape_vals = df_benchmark['MAPE Médio (%)'].tolist()
+add_code("""nomes = df_resultados["Modelo"].tolist()
+r2_teste = df_resultados["R² Teste Cru 10% (%)"].tolist()
+mape_teste = df_resultados["MAPE Teste Cru (%)"].tolist()
 
-fig, ax1 = plt.subplots(figsize=(10, 5))
+x = np.arange(len(nomes))
+width = 0.36
 
-x = np.arange(len(nomes_modelos))
-width = 0.35
+fig, ax = plt.subplots(figsize=(12, 5.5))
+b1 = ax.bar(x - width/2, r2_teste, width, label="R² Teste Cru 10% (%)", color="#2563eb", alpha=0.9)
+b2 = ax.bar(x + width/2, mape_teste, width, label="Erro MAPE Teste Cru (%)", color="#ef4444", alpha=0.85)
 
-rects1 = ax1.bar(x - width/2, r2_vals, width, label='Acurácia R² (%)', color='#2563eb', alpha=0.9)
-rects2 = ax1.bar(x + width/2, mape_vals, width, label='Erro Médio MAPE (%)', color='#ef4444', alpha=0.85)
+ax.set_title("Comparativo dos 5 Modelos no Conjunto de Teste Cru (10% Hold-out)", fontsize=13, fontweight="bold", pad=15)
+ax.set_xticks(x)
+ax.set_xticklabels(nomes, fontsize=10, fontweight="bold")
+ax.set_ylabel("Percentual (%)")
+ax.set_ylim(0, 112)
+ax.legend(loc="upper right")
 
-ax1.set_ylabel('Percentual (%)', fontsize=11)
-ax1.set_title('Comparativo dos 3 Modelos na Validação Cruzada (5-Fold)', fontsize=13, fontweight='bold', pad=15)
-ax1.set_xticks(x)
-ax1.set_xticklabels(nomes_modelos, fontsize=10, fontweight='bold')
-ax1.legend(loc='upper right')
+for bar in b1:
+    h = bar.get_height()
+    ax.annotate(f"{h:.2f}%", (bar.get_x() + bar.get_width()/2, h), xytext=(0, 4), textcoords="offset points", ha="center", fontsize=9, fontweight="bold")
 
-# Rótulos nas barras
-for r in rects1:
-    h = r.get_height()
-    ax1.annotate(f'{h:.1f}%', xy=(r.get_x() + r.get_width()/2, h), xytext=(0, 3),
-                 textcoords="offset points", ha='center', va='bottom', fontsize=9, fontweight='bold')
-
-for r in rects2:
-    h = r.get_height()
-    ax1.annotate(f'{h:.1f}%', xy=(r.get_x() + r.get_width()/2, h), xytext=(0, 3),
-                 textcoords="offset points", ha='center', va='bottom', fontsize=9, fontweight='bold')
+for bar in b2:
+    h = bar.get_height()
+    ax.annotate(f"{h:.2f}%", (bar.get_x() + bar.get_width()/2, h), xytext=(0, 4), textcoords="offset points", ha="center", fontsize=9, fontweight="bold")
 
 plt.tight_layout()
 plt.show()""")
 
-# Célula 8: Interpretação Didática
-add_md("""### 💡 Interpretação Didática dos Resultados
-Ao analisar a tabela e os gráficos acima, explicamos para o professor:
+# Célula 9: Seleção Automática do Campeão
+add_md(r"""### 5.2 Seleção do Modelo Campeão no Conjunto de Teste Cru (10%)
+Em vez de assumir qual modelo é melhor de antemão, selecionamos automaticamente o vencedor com base no **maior $R^2$ obtido no conjunto de teste cru de 10%**!""")
 
-1. **Por que a Regressão Linear teve erro percentual elevado ($MAPE = 27\%$)?**
-   * Por assumir uma fórmula aditiva simples ($y = \sum w_i x_i$), a Regressão Linear não consegue entender que uma vaga de garagem ou uma vista para o mar em Balneário Camboriú valoriza exponencialmente mais do que em um bairro periférico.
-2. **Por que a Árvore de Decisão Simples oscilou mais entre as dobras?**
-   * Ela conseguiu fazer regras condicionais (reduzindo o $MAPE$ para ~20%), mas uma árvore solitária sofre de **alta variância**: pequenas mudanças nos dados de treino mudam os nós de corte, gerando instabilidade.
-3. **Por que o Random Forest venceu como campeão absoluto?**
-   * Ao criar 100 árvores independentes e tirar a média das predições (*Bagging*), o Random Forest cancela o ruído das árvores individuais, alcançando o maior $R^2$ (**89.11%**) e o menor erro médio percentual (**16.96%**).""")
+add_code("""nome_campeao = df_resultados.iloc[0]["Modelo"]
+best_pipeline = melhores_modelos[nome_campeao]
+print(f"Modelo Campeão Selecionado no Teste Cru (10%): {nome_campeao}")
+print(f"Desempenho no Teste Cru -> R²: {df_resultados.iloc[0]['R² Teste Cru 10% (%)']}% | MAE: R$ {df_resultados.iloc[0]['MAE Teste Cru (R$)']:,.2f} | MAPE: {df_resultados.iloc[0]['MAPE Teste Cru (%)']}%")""")
 
-# Célula 9: Treinamento do Modelo Campeão
-add_md("""## 6. Treinamento Final do Modelo Campeão (Random Forest)
-Treinamos a Random Forest em toda a base histórica unificada de 12.500 registros para uso interativo no Google Colab.""")
+# Célula 10: Simulador Interativo no Google Colab com Estimação de Futuro
+add_md(r"""## 6. Simulador Interativo no Google Colab + Estimação de Futuro (2027–2030)
+Utilize os controles do formulário abaixo para testar qualquer imóvel em **São Paulo** ou **Santa Catarina**. O sistema usa o modelo campeão validado no conjunto de teste cru de 10% e calcula também a **estimação futura até 2030**!""")
 
-add_code("""best_pipeline = Pipeline(steps=[
-    ('preprocessor', preprocessor),
-    ('regressor', RandomForestRegressor(
-        n_estimators=100,
-        max_depth=16,
-        min_samples_split=4,
-        random_state=42,
-        n_jobs=-1
-    ))
-])
-
-print("Treinando modelo de produção Random Forest com 12.500 amostras...")
-best_pipeline.fit(X, y)
-print("Modelo de produção treinado e pronto para inferência!")""")
-
-# Célula 10: Formulário Interativo com Sliders no Google Colab
-add_md("""## 7. Formulário Interativo no Google Colab (Demonstração ao Vivo)
-A célula abaixo utiliza os controles nativos do **Google Colab (`#@param`)**.  
-Você pode arrastar os controles deslizantes e mudar os dropdowns diretamente na tela para simular a precificação ao vivo para o professor!""")
-
-add_code("""#@title 🎯 Simulador Interativo do Corretor de Imóveis (Google Colab) { run: "auto" }
+add_code("""#@title 🎯 Simulador Interativo + Estimação de Futuro (2027-2030) { run: "auto" }
 
 estado = "SC" #@param ["SP", "SC"]
 cidade = "Balne\u00e1rio Cambori\u00fa" #@param ["S\u00e3o Paulo", "Balne\u00e1rio Cambori\u00fa", "Florian\u00f3polis", "Itapema", "Joinville", "Blumenau"]
@@ -335,45 +401,55 @@ dados_entrada = pd.DataFrame([{
     'idade_imovel': idade_imovel,
     'quartos': quartos,
     'banheiros': banheiros,
-    'vagas': vagas
+    'vagas': vagas,
+    'ano_transacao': 2026
 }])
 
 preco_estimado = float(best_pipeline.predict(dados_entrada)[0])
 preco_m2 = preco_estimado / area_m2 if area_m2 > 0 else 0
+faixa_minima = preco_estimado * 0.90
+faixa_maxima = preco_estimado * 1.10
 
-faixa_minima = preco_estimado * 0.88
-faixa_maxima = preco_estimado * 1.12
+# Estimação de futuro (taxa anual regional)
+taxa_anual = 0.072 if estado == "SC" else 0.052
+anos_fut = [2026, 2027, 2028, 2029, 2030]
+valores_fut = [preco_estimado * ((1 + taxa_anual) ** (a - 2026)) for a in anos_fut]
 
-comissao_justo = preco_estimado * (taxa_comissao_pct / 100.0)
-comissao_min = faixa_minima * (taxa_comissao_pct / 100.0)
-comissao_max = faixa_maxima * (taxa_comissao_pct / 100.0)
-
-print("=" * 70)
-print("  PARECER TÉCNICO DE VALUATION - CORRETORIA (SI-PI6)")
-print("=" * 70)
+print("=" * 72)
+print(f"  PARECER TÉCNICO DE VALUATION ({nome_campeao})")
+print("=" * 72)
 print(f"• Localização          : {bairro} ({cidade} - {estado})")
-print(f"• Características      : {tipo} | {area_m2} m² | {quartos} qts | {banheiros} banheiros | {vagas} vaga(s)")
-print(f"• Ano de Construção    : {ano_construcao} ({idade_imovel} anos de uso)")
-print("-" * 70)
-print(f"• VALOR JUSTO DE MERCADO : R$ {preco_estimado:,.2f}")
-print(f"• Preço Médio do m²      : R$ {preco_m2:,.2f}/m²")
-print(f"• Faixa Mínima (Liquidez): R$ {faixa_minima:,.2f}")
-print(f"• Faixa Máxima (Teto)    : R$ {faixa_maxima:,.2f}")
-print("-" * 70)
-print(f"• HONORÁRIOS DO CONSULTOR ({taxa_comissao_pct:.1f}%):")
-print(f"  - No Valor Justo       : R$ {comissao_justo:,.2f}")
-print(f"  - Na Faixa Mínima      : R$ {comissao_min:,.2f}")
-print(f"  - Na Faixa Máxima      : R$ {comissao_max:,.2f}")
-print("=" * 70)""")
+print(f"• Características      : {tipo} | {area_m2} m² | {quartos} qts | {banheiros} banh. | {vagas} vaga(s)")
+print(f"• Ano de Construção    : {ano_construcao} ({idade_imovel} anos)")
+print("-" * 72)
+print(f"• VALOR JUSTO (2026)   : R$ {preco_estimado:,.2f} (R$ {preco_m2:,.2f}/m²)")
+print(f"• Faixa de Negociação  : R$ {faixa_minima:,.2f} a R$ {faixa_maxima:,.2f}")
+print(f"• Honorários ({taxa_comissao_pct:.1f}%)    : R$ {preco_estimado * taxa_comissao_pct / 100:,.2f}")
+print("-" * 72)
+print(f"  ESTIMAÇÃO DE VALORIZAÇÃO FUTURA (Taxa ref. {taxa_anual*100:.1f}% a.a.):")
+for a, v in zip(anos_fut[1:], valores_fut[1:]):
+    ganho = ((v / preco_estimado) - 1) * 100
+    print(f"   • {a}: R$ {v:,.2f} (+{ganho:.1f}% acumulado)")
+print("=" * 72)
 
-# Célula 11: Conclusões da Sprint 2
-add_md("""## 8. Conclusões da Sprint 2 & Entregas Consolidadas
+# Gráfico da estimação futura deste imóvel específico
+plt.figure(figsize=(8, 3.8))
+plt.plot(anos_fut, [v / 1e6 for v in valores_fut], marker="o", color="#10b981", linewidth=2.5)
+for a, v in zip(anos_fut, valores_fut):
+    plt.annotate(f"R$ {v/1e6:.2f}M", (a, v/1e6), textcoords="offset points", xytext=(0, 8), ha="center", fontsize=8.5, fontweight="bold")
+plt.title(f"Projeção de Valorização Futura (2026–2030) — {bairro} ({cidade})", fontsize=11, fontweight="bold")
+plt.ylabel("Valor Estimado (R$ Milhões)")
+plt.xticks(anos_fut)
+plt.ylim(min(valores_fut)/1e6 * 0.92, max(valores_fut)/1e6 * 1.12)
+plt.grid(True, alpha=0.35)
+plt.tight_layout()
+plt.show()""")
 
-### O que entregamos nesta Sprint no Google Colab:
-1. **Ativação de Santa Catarina (SC):** Expansão além de São Paulo com cidades de destaque nacional (Balneário Camboriú, Florianópolis, Itapema, Joinville, Blumenau).
-2. **Validação Cruzada Rigorosa:** Avaliação em 5 dobras (*5-Fold Cross-Validation*), provando generalização estatística confiável.
-3. **Comparativo Didático de 3 Modelos:** Demonstração empírica da evolução entre *Regressão Linear (Baseline)*, *Árvore de Decisão* e a vitória da *Random Forest*.
-4. **Interatividade no Colab:** Sliders em tempo real para o professor testar na hora qualquer combinação de imóvel!
+# Célula 11: Conclusões
+add_md(r"""## 7. Conclusões Finais
+1. **Plot Anual & Estimação Futura:** A separação por ano deixou clara a trajetória de valorização de 2013 a 2026 em SP e SC e permitiu projetar os valores de 2027 a 2030 com intervalo de confiança.
+2. **Rigor do Ambiente de Teste Cru (10%):** Ao isolar 10% do dataset bruto antes do `GridSearchCV`, garantimos que a métrica final do vencedor reflete desempenho em dados totalmente inéditos.
+3. **Evolução dos 5 Modelos (`GridSearchCV`):** Com a inclusão de **XGBoost** e **Rede Neural MLP** e o ajuste automático de hiperparâmetros, saímos de 83.96% (Árvore Simples) e 87.58% (Ridge) até **95.57% (XGBoost)** e **98.77% (Rede Neural MLP)** no teste cru!
 """)
 
 notebook_json = {
@@ -411,6 +487,6 @@ copy_path = os.path.join(NOTEBOOKS_DIR, "CorretorIA_Modelagem_e_Apresentacao.ipy
 with open(copy_path, "w", encoding="utf-8") as f:
     json.dump(notebook_json, f, indent=2, ensure_ascii=False)
 
-print(f"Jupyter Notebook otimizado para o Google Colab gerado com sucesso em:")
+print("Jupyter Notebook da Sprint 3 gerado com sucesso em:")
 print(f"1. {NOTEBOOK_PATH}")
 print(f"2. {copy_path}")

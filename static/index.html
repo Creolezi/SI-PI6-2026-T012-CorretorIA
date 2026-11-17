@@ -31,7 +31,7 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
           </svg>
-          Comparativo de 3 Modelos (K-Fold)
+          GridSearchCV & 5 Modelos (Teste Cru 10%)
         </button>
         <span class="badge badge-academic">SI-PI6 2026 • Turma 012</span>
         <span class="badge badge-status" id="system-status-badge">
@@ -299,6 +299,17 @@
             </div>
           </div>
 
+          <!-- Card de Estimação de Futuro (2027-2030) -->
+          <div class="future-box" id="future-box">
+            <div class="future-header">
+              <span>📈 Estimação de Futuro (Projeção 2027–2030)</span>
+              <span class="future-rate-badge">Valorização est. <strong id="res-taxa-valorizacao">+5.5% a.a.</strong></span>
+            </div>
+            <div class="future-grid" id="future-grid">
+              <!-- Renderizado via JS -->
+            </div>
+          </div>
+
           <!-- Explicabilidade da IA -->
           <div class="factors-box">
             <h4>Fundamentação Técnica do Preço (IA Explicável)</h4>
@@ -311,7 +322,7 @@
       </section>
     </div>
 
-    <!-- Seção de Benchmark Didático de 3 Modelos (Validação Cruzada K-Fold) -->
+    <!-- Seção de Benchmark com GridSearchCV + Ambiente de Teste Isolado (10% Hold-out Cru) -->
     <section class="card benchmark-section" id="benchmark-section">
       <div class="card-header">
         <div class="benchmark-header-wrap">
@@ -320,28 +331,29 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M18 20V10M12 20V4M6 20v-6"></path>
               </svg>
-              Comparativo Científico de Modelos (Validação Cruzada 5-Fold)
+              Benchmark com GridSearchCV + Ambiente de Teste Isolado (10% Hold-out Cru)
             </h2>
             <p class="card-subtitle">
-              Avaliação empírica de 3 abordagens distintas sobre a base integrada de 12.500 registros (SP e SC)
+              90% dos dados (11.250 amostras) usados para ajuste de hiperparâmetros via GridSearchCV (5-Fold) • 10% (1.250 amostras cruas) isolados para teste cego final
             </p>
           </div>
-          <span class="badge badge-kfold">5 Folds • Sem Overfitting</span>
+          <span class="badge badge-kfold">5 Modelos • 10% Teste Cru</span>
         </div>
       </div>
 
-      <!-- Tabela Comparativa dos 3 Modelos -->
+      <!-- Tabela Comparativa dos 5 Modelos -->
       <div class="table-responsive">
         <table class="market-table benchmark-table">
           <thead>
             <tr>
               <th>Modelo de Inteligência Artificial</th>
-              <th>Família / Tipo</th>
-              <th>Acurácia (R² Médio)</th>
-              <th>Erro Médio em R$ (MAE)</th>
-              <th>Erro Percentual (MAPE)</th>
-              <th>Tempo de Treino</th>
-              <th>Classificação</th>
+              <th>Melhores Parâmetros (GridSearchCV)</th>
+              <th>R² CV (90%)</th>
+              <th>R² Teste Cru (10%)</th>
+              <th>MAE Teste Cru</th>
+              <th>MAPE Teste Cru</th>
+              <th>Tempo</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody id="benchmark-table-body">
@@ -350,39 +362,76 @@
         </table>
       </div>
 
-      <!-- Cards Didáticos Explicando os 3 Modelos e a Validação Cruzada -->
-      <div class="didactic-grid">
-        <div class="didactic-card">
-          <div class="didactic-tag baseline">Modelo 1 • Baseline</div>
-          <h4>Regressão Linear (Ridge)</h4>
+      <!-- Cards Didáticos Explicando os 5 Modelos e a Separação 90% / 10% Cru -->
+      <div class="didactic-grid didactic-grid-5">
+        <div class="didactic-card kfold-card">
+          <div class="didactic-tag kfold">Ambiente Isolado</div>
+          <h4>Separação 90% / 10% Cru</h4>
           <p class="didactic-desc">
-            Assume que o preço é uma soma ponderada direta dos atributos. É ultrarrápido (0.04s), mas não capta efeitos não-lineares, resultando em um erro percentual maior (~27%).
+            Antes de qualquer treino ou ajuste, 10% do dataset bruto (1.250 imóveis) é guardado à parte. Todos os modelos ajustados no GridSearchCV são testados nesses dados inéditos sem viés.
           </p>
         </div>
 
         <div class="didactic-card">
-          <div class="didactic-tag tree">Modelo 2 • Não-Linear</div>
-          <h4>Árvore de Decisão Simples</h4>
+          <div class="didactic-tag baseline">Linear</div>
+          <h4>Regressão Ridge (Baseline)</h4>
           <p class="didactic-desc">
-            Cria regras condicionais de if/else para segmentar o mercado. Melhora o erro percentual (~20%), porém uma árvore isolada tem alta variância entre as dobras da validação cruzada.
+            Modelo linear regularizado L2. Rápido, mas limitado para captar interações não-lineares entre bairro nobre, vagas e metragem.
+          </p>
+        </div>
+
+        <div class="didactic-card">
+          <div class="didactic-tag tree">Árvores</div>
+          <h4>Decision Tree & Random Forest</h4>
+          <p class="didactic-desc">
+            A árvore simples capta regras condicionais e a Random Forest reduz a variância combinando dezenas de árvores em paralelo (Bagging).
+          </p>
+        </div>
+
+        <div class="didactic-card">
+          <div class="didactic-tag boost">Boosting</div>
+          <h4>XGBoost Regressor</h4>
+          <p class="didactic-desc">
+            Árvores sequenciais que corrigem erros residuais passo a passo (Gradient Boosting), alcançando altíssima precisão tabular e velocidade.
           </p>
         </div>
 
         <div class="didactic-card highlight-card">
-          <div class="didactic-tag winner">Modelo 3 • Campeão 🏆</div>
-          <h4>Random Forest (Ensemble)</h4>
+          <div class="didactic-tag winner">Deep Learning Tabular 🏆</div>
+          <h4>Rede Neural MLP</h4>
           <p class="didactic-desc">
-            Combina 100 árvores de decisão com subamostras aleatórias (Bagging). Reduz o ruído individual, atinge a maior acurácia explicada (89.11%) e o menor erro médio (~16.9%).
+            Perceptron Multicamadas com escalonamento do alvo. Otimizada no GridSearchCV, atingiu a maior acurácia (98.77%) e menor erro (6.24%) no teste cru!
           </p>
         </div>
+      </div>
+    </section>
 
-        <div class="didactic-card kfold-card">
-          <div class="didactic-tag kfold">Metodologia Científica</div>
-          <h4>Por que Validação Cruzada (5-Fold)?</h4>
-          <p class="didactic-desc">
-            Em vez de uma divisão única e sortuda de 80/20, os dados são divididos em 5 partes. O modelo é treinado 5 vezes, testando em cada dobra separadamente para provar robustez real.
-          </p>
+    <!-- Seção de Série Histórica Anual (2013-2026) & Estimação de Futuro (2027-2030) -->
+    <section class="card yearly-trends-section" id="yearly-trends-section">
+      <div class="card-header">
+        <div class="benchmark-header-wrap">
+          <div>
+            <h2>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3v18h18"></path>
+                <path d="m19 9-5 5-4-4-3 3"></path>
+              </svg>
+              <span id="yearly-title-text">Variação Anual (2013–2026) & Estimação de Futuro (2027–2030)</span>
+            </h2>
+            <p class="card-subtitle">
+              Evolução histórica ano a ano do preço médio do m² e projeção de tendência futura para o estado selecionado
+            </p>
+          </div>
+          <span class="badge badge-status">Série 2013–2030</span>
         </div>
+      </div>
+
+      <div class="yearly-bars-container" id="yearly-bars-container">
+        <!-- Barras anuais renderizadas via JS -->
+      </div>
+      <div class="yearly-legend">
+        <span><span class="legend-swatch swatch-hist"></span> Histórico Realizado (2013–2026)</span>
+        <span><span class="legend-swatch swatch-fut"></span> Estimação de Futuro (2027–2030)</span>
       </div>
     </section>
 
@@ -408,8 +457,8 @@
           <div class="stat-desc">Valor Médio do m² da Região</div>
         </div>
         <div class="stat-card">
-          <div class="stat-number" id="stat-r2-score">89.1%</div>
-          <div class="stat-desc">R² Médio na Validação Cruzada</div>
+          <div class="stat-number" id="stat-r2-score">98.8%</div>
+          <div class="stat-desc">R² no Teste Cru (10% Hold-out)</div>
         </div>
         <div class="stat-card">
           <div class="stat-number" id="stat-idade-media">14.1 anos</div>

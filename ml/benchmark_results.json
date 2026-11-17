@@ -1,151 +1,397 @@
 {
-  "timestamp": "2026-10-26 13:59:34",
+  "timestamp": "2026-11-16 21:11:43",
   "total_amostras": 12500,
   "amostras_sp": 7500,
   "amostras_sc": 5000,
   "n_folds": 5,
-  "modelo_campeao": "random_forest",
+  "holdout_info": {
+    "treino_cv_pct": 90,
+    "teste_cru_pct": 10,
+    "amostras_treino_cv": 11250,
+    "amostras_teste_cru": 1250,
+    "estratificado_por": "estado"
+  },
+  "modelo_campeao": "mlp_neural_net",
   "modelos": [
     {
+      "id": "mlp_neural_net",
+      "nome": "Rede Neural MLP (Multi-Layer Perceptron)",
+      "tipo": "Rede Neural Artificial",
+      "descricao_didatica": "Perceptron Multicamadas com escalonamento do alvo (StandardScaler). O GridSearchCV busca melhor arquitetura de camadas ocultas, regularização L2 e taxa de aprendizado.",
+      "combinacoes_grid": 8,
+      "melhores_parametros": {
+        "alpha": 0.001,
+        "hidden_layer_sizes": [
+          64,
+          32
+        ],
+        "learning_rate_init": 0.005
+      },
+      "r2_cv_medio": 0.9861,
+      "r2_cv_pct": 98.61,
+      "r2_medio": 0.9877,
+      "r2_pct": 98.77,
+      "mae_medio": 75144.29,
+      "mape_medio_pct": 6.24,
+      "rmse_medio": 132956.46,
+      "tempo_treino_seg": 15.5
+    },
+    {
+      "id": "xgboost",
+      "nome": "XGBoost (Extreme Gradient Boosting)",
+      "tipo": "Ensemble (Boosting)",
+      "descricao_didatica": "Árvores sequenciais que corrigem os erros residuais das árvores anteriores via gradiente descendente. Alta performance em dados tabulares.",
+      "combinacoes_grid": 8,
+      "melhores_parametros": {
+        "learning_rate": 0.1,
+        "max_depth": 5,
+        "n_estimators": 150
+      },
+      "r2_cv_medio": 0.9645,
+      "r2_cv_pct": 96.45,
+      "r2_medio": 0.9557,
+      "r2_pct": 95.57,
+      "mae_medio": 94471.28,
+      "mape_medio_pct": 7.02,
+      "rmse_medio": 252241.68,
+      "tempo_treino_seg": 4.98
+    },
+    {
       "id": "random_forest",
-      "nome": "Random Forest (Ensemble)",
+      "nome": "Random Forest (Ensemble Bagging)",
       "tipo": "Ensemble (Bagging)",
-      "descricao_didatica": "Combina 100 árvores de decisão treinadas em subconjuntos aleatórios de dados. A média das árvores cancela os ruídos individuais, reduzindo a variância e alcançando a maior acurácia.",
-      "r2_medio": 0.8911,
-      "r2_std": 0.0163,
-      "r2_pct": 89.11,
-      "mae_medio": 197551.32,
-      "mae_std": 3908.6,
-      "mape_medio_pct": 16.96,
-      "mape_std_pct": 0.11,
-      "rmse_medio": 358445.46,
-      "tempo_treino_seg": 0.778,
-      "folds_detalhes": [
-        {
-          "fold": 1,
-          "r2": 0.8916,
-          "mae": 196236.53,
-          "mape_pct": 17.14
-        },
-        {
-          "fold": 2,
-          "r2": 0.9165,
-          "mae": 193215.28,
-          "mape_pct": 16.82
-        },
-        {
-          "fold": 3,
-          "r2": 0.8924,
-          "mae": 194908.61,
-          "mape_pct": 16.98
-        },
-        {
-          "fold": 4,
-          "r2": 0.8898,
-          "mae": 204388.85,
-          "mape_pct": 16.88
-        },
-        {
-          "fold": 5,
-          "r2": 0.865,
-          "mae": 199007.36,
-          "mape_pct": 16.98
-        }
-      ]
+      "descricao_didatica": "Combina dezenas de árvores em subamostras aleatórias (Bagging). O GridSearchCV calibra quantidade de árvores, profundidade e critério de divisão.",
+      "combinacoes_grid": 8,
+      "melhores_parametros": {
+        "max_depth": 16,
+        "min_samples_split": 4,
+        "n_estimators": 120
+      },
+      "r2_cv_medio": 0.9159,
+      "r2_cv_pct": 91.59,
+      "r2_medio": 0.9168,
+      "r2_pct": 91.68,
+      "mae_medio": 159587.28,
+      "mape_medio_pct": 12.41,
+      "rmse_medio": 345499.69,
+      "tempo_treino_seg": 29.55
     },
     {
       "id": "ridge",
       "nome": "Regressão Linear (Ridge - Baseline)",
       "tipo": "Linear Regularizado",
-      "descricao_didatica": "Modelo estatístico clássico que assume relação direta e proporcional entre atributos e preço. Rápido, mas tem dificuldade para capturar efeitos não-lineares (ex: valor desproporcional de vagas em áreas nobres).",
-      "r2_medio": 0.8633,
-      "r2_std": 0.0101,
-      "r2_pct": 86.33,
-      "mae_medio": 242727.1,
-      "mae_std": 3073.03,
-      "mape_medio_pct": 27.14,
-      "mape_std_pct": 0.59,
-      "rmse_medio": 402629.96,
-      "tempo_treino_seg": 0.035,
-      "folds_detalhes": [
-        {
-          "fold": 1,
-          "r2": 0.8623,
-          "mae": 238543.89,
-          "mape_pct": 26.41
-        },
-        {
-          "fold": 2,
-          "r2": 0.8786,
-          "mae": 244154.47,
-          "mape_pct": 27.67
-        },
-        {
-          "fold": 3,
-          "r2": 0.8694,
-          "mae": 240081.16,
-          "mape_pct": 27.62
-        },
-        {
-          "fold": 4,
-          "r2": 0.8575,
-          "mae": 247173.05,
-          "mape_pct": 26.42
-        },
-        {
-          "fold": 5,
-          "r2": 0.8489,
-          "mae": 243682.93,
-          "mape_pct": 27.55
-        }
-      ]
+      "descricao_didatica": "Baseline paramétrico linear com regularização L2. Varia o coeficiente alpha no GridSearchCV, mas continua limitado por não captar não-linearidades complexas.",
+      "combinacoes_grid": 4,
+      "melhores_parametros": {
+        "alpha": 1.0
+      },
+      "r2_cv_medio": 0.8902,
+      "r2_cv_pct": 89.02,
+      "r2_medio": 0.8758,
+      "r2_pct": 87.58,
+      "mae_medio": 220306.01,
+      "mape_medio_pct": 26.17,
+      "rmse_medio": 422186.5,
+      "tempo_treino_seg": 4.05
     },
     {
       "id": "decision_tree",
       "nome": "Árvore de Decisão (Decision Tree)",
       "tipo": "Árvore Simples",
-      "descricao_didatica": "Segmenta o mercado através de regras if/else sequenciais. Consegue identificar nichos não-lineares, mas uma única árvore sofre com alta variância e risco de overfitting.",
-      "r2_medio": 0.8186,
-      "r2_std": 0.0248,
-      "r2_pct": 81.86,
-      "mae_medio": 243911.24,
-      "mae_std": 1953.3,
-      "mape_medio_pct": 20.6,
-      "mape_std_pct": 0.34,
-      "rmse_medio": 462010.44,
-      "tempo_treino_seg": 0.062,
-      "folds_detalhes": [
-        {
-          "fold": 1,
-          "r2": 0.8254,
-          "mae": 242208.52,
-          "mape_pct": 21.13
-        },
-        {
-          "fold": 2,
-          "r2": 0.8329,
-          "mae": 245284.42,
-          "mape_pct": 20.42
-        },
-        {
-          "fold": 3,
-          "r2": 0.8053,
-          "mae": 243844.05,
-          "mape_pct": 20.85
-        },
-        {
-          "fold": 4,
-          "r2": 0.8508,
-          "mae": 246775.02,
-          "mape_pct": 20.31
-        },
-        {
-          "fold": 5,
-          "r2": 0.7785,
-          "mae": 241444.19,
-          "mape_pct": 20.28
-        }
-      ]
+      "descricao_didatica": "Modelo baseado em regras condicionais. O GridSearchCV ajusta profundidade máxima (max_depth) e divisão mínima (min_samples_split) para conter overfitting.",
+      "combinacoes_grid": 6,
+      "melhores_parametros": {
+        "max_depth": 16,
+        "min_samples_split": 10
+      },
+      "r2_cv_medio": 0.8387,
+      "r2_cv_pct": 83.87,
+      "r2_medio": 0.8396,
+      "r2_pct": 83.96,
+      "mae_medio": 215849.67,
+      "mape_medio_pct": 16.3,
+      "rmse_medio": 479909.58,
+      "tempo_treino_seg": 0.69
     }
-  ]
+  ],
+  "serie_anual_historica": {
+    "SP": [
+      {
+        "ano": 2013,
+        "preco_m2_medio": 8113.4,
+        "preco_m2_mediana": 7621.91,
+        "preco_total_medio": 879210.95,
+        "amostras": 508
+      },
+      {
+        "ano": 2014,
+        "preco_m2_medio": 8383.46,
+        "preco_m2_mediana": 8000.76,
+        "preco_total_medio": 920120.04,
+        "amostras": 514
+      },
+      {
+        "ano": 2015,
+        "preco_m2_medio": 8776.3,
+        "preco_m2_mediana": 8321.91,
+        "preco_total_medio": 1019680.02,
+        "amostras": 559
+      },
+      {
+        "ano": 2016,
+        "preco_m2_medio": 9155.29,
+        "preco_m2_mediana": 8567.92,
+        "preco_total_medio": 979010.0,
+        "amostras": 550
+      },
+      {
+        "ano": 2017,
+        "preco_m2_medio": 9454.69,
+        "preco_m2_mediana": 8998.28,
+        "preco_total_medio": 1030744.38,
+        "amostras": 490
+      },
+      {
+        "ano": 2018,
+        "preco_m2_medio": 9799.63,
+        "preco_m2_mediana": 9286.69,
+        "preco_total_medio": 1093726.2,
+        "amostras": 583
+      },
+      {
+        "ano": 2019,
+        "preco_m2_medio": 10127.8,
+        "preco_m2_mediana": 9754.43,
+        "preco_total_medio": 1120908.42,
+        "amostras": 516
+      },
+      {
+        "ano": 2020,
+        "preco_m2_medio": 10396.57,
+        "preco_m2_mediana": 10049.02,
+        "preco_total_medio": 1092645.61,
+        "amostras": 552
+      },
+      {
+        "ano": 2021,
+        "preco_m2_medio": 10752.06,
+        "preco_m2_mediana": 10375.48,
+        "preco_total_medio": 1153248.08,
+        "amostras": 559
+      },
+      {
+        "ano": 2022,
+        "preco_m2_medio": 11157.71,
+        "preco_m2_mediana": 10640.24,
+        "preco_total_medio": 1221923.7,
+        "amostras": 546
+      },
+      {
+        "ano": 2023,
+        "preco_m2_medio": 11499.48,
+        "preco_m2_mediana": 10766.48,
+        "preco_total_medio": 1290670.78,
+        "amostras": 496
+      },
+      {
+        "ano": 2024,
+        "preco_m2_medio": 11756.27,
+        "preco_m2_mediana": 11275.61,
+        "preco_total_medio": 1225720.23,
+        "amostras": 580
+      },
+      {
+        "ano": 2025,
+        "preco_m2_medio": 12007.78,
+        "preco_m2_mediana": 11445.2,
+        "preco_total_medio": 1395125.82,
+        "amostras": 522
+      },
+      {
+        "ano": 2026,
+        "preco_m2_medio": 12556.49,
+        "preco_m2_mediana": 12007.42,
+        "preco_total_medio": 1381044.24,
+        "amostras": 525
+      }
+    ],
+    "SC": [
+      {
+        "ano": 2013,
+        "preco_m2_medio": 7908.88,
+        "preco_m2_mediana": 7652.98,
+        "preco_total_medio": 930302.88,
+        "amostras": 335
+      },
+      {
+        "ano": 2014,
+        "preco_m2_medio": 8177.14,
+        "preco_m2_mediana": 7635.56,
+        "preco_total_medio": 913629.57,
+        "amostras": 359
+      },
+      {
+        "ano": 2015,
+        "preco_m2_medio": 8694.21,
+        "preco_m2_mediana": 8271.73,
+        "preco_total_medio": 1086539.33,
+        "amostras": 363
+      },
+      {
+        "ano": 2016,
+        "preco_m2_medio": 9380.34,
+        "preco_m2_mediana": 8794.79,
+        "preco_total_medio": 1086458.92,
+        "amostras": 336
+      },
+      {
+        "ano": 2017,
+        "preco_m2_medio": 10145.21,
+        "preco_m2_mediana": 9583.76,
+        "preco_total_medio": 1161249.04,
+        "amostras": 350
+      },
+      {
+        "ano": 2018,
+        "preco_m2_medio": 10165.58,
+        "preco_m2_mediana": 9513.42,
+        "preco_total_medio": 1137453.11,
+        "amostras": 352
+      },
+      {
+        "ano": 2019,
+        "preco_m2_medio": 10734.24,
+        "preco_m2_mediana": 10424.4,
+        "preco_total_medio": 1133805.52,
+        "amostras": 386
+      },
+      {
+        "ano": 2020,
+        "preco_m2_medio": 10737.18,
+        "preco_m2_mediana": 10366.32,
+        "preco_total_medio": 1211847.04,
+        "amostras": 344
+      },
+      {
+        "ano": 2021,
+        "preco_m2_medio": 11937.38,
+        "preco_m2_mediana": 11264.83,
+        "preco_total_medio": 1442279.89,
+        "amostras": 376
+      },
+      {
+        "ano": 2022,
+        "preco_m2_medio": 12153.69,
+        "preco_m2_mediana": 11793.15,
+        "preco_total_medio": 1516584.62,
+        "amostras": 365
+      },
+      {
+        "ano": 2023,
+        "preco_m2_medio": 12593.45,
+        "preco_m2_mediana": 11894.08,
+        "preco_total_medio": 1420609.26,
+        "amostras": 364
+      },
+      {
+        "ano": 2024,
+        "preco_m2_medio": 13046.8,
+        "preco_m2_mediana": 12671.76,
+        "preco_total_medio": 1358965.65,
+        "amostras": 390
+      },
+      {
+        "ano": 2025,
+        "preco_m2_medio": 13657.42,
+        "preco_m2_mediana": 13152.62,
+        "preco_total_medio": 1642138.8,
+        "amostras": 344
+      },
+      {
+        "ano": 2026,
+        "preco_m2_medio": 13331.03,
+        "preco_m2_mediana": 12950.94,
+        "preco_total_medio": 1524699.26,
+        "amostras": 336
+      }
+    ]
+  },
+  "projecao_futura_anual": {
+    "SP": [
+      {
+        "ano": 2027,
+        "preco_m2_estimado": 12794.91,
+        "preco_m2_min": 12730.25,
+        "preco_m2_max": 12859.57,
+        "preco_total_estimado": 1407265.77,
+        "preco_total_min": 1362076.82,
+        "preco_total_max": 1452454.71
+      },
+      {
+        "ano": 2028,
+        "preco_m2_estimado": 13130.07,
+        "preco_m2_min": 13052.48,
+        "preco_m2_max": 13207.67,
+        "preco_total_estimado": 1444389.02,
+        "preco_total_min": 1390162.29,
+        "preco_total_max": 1498615.76
+      },
+      {
+        "ano": 2029,
+        "preco_m2_estimado": 13465.23,
+        "preco_m2_min": 13374.7,
+        "preco_m2_max": 13555.76,
+        "preco_total_estimado": 1481512.28,
+        "preco_total_min": 1418247.77,
+        "preco_total_max": 1544776.8
+      },
+      {
+        "ano": 2030,
+        "preco_m2_estimado": 13800.39,
+        "preco_m2_min": 13696.93,
+        "preco_m2_max": 13903.85,
+        "preco_total_estimado": 1518635.54,
+        "preco_total_min": 1446333.24,
+        "preco_total_max": 1590937.85
+      }
+    ],
+    "SC": [
+      {
+        "ano": 2027,
+        "preco_m2_estimado": 14329.69,
+        "preco_m2_min": 14015.22,
+        "preco_m2_max": 14644.17,
+        "preco_total_estimado": 1638834.33,
+        "preco_total_min": 1541076.48,
+        "preco_total_max": 1736592.18
+      },
+      {
+        "ano": 2028,
+        "preco_m2_estimado": 14786.39,
+        "preco_m2_min": 14409.02,
+        "preco_m2_max": 15163.76,
+        "preco_total_estimado": 1690044.97,
+        "preco_total_min": 1572735.55,
+        "preco_total_max": 1807354.4
+      },
+      {
+        "ano": 2029,
+        "preco_m2_estimado": 15243.08,
+        "preco_m2_min": 14802.82,
+        "preco_m2_max": 15683.35,
+        "preco_total_estimado": 1741255.62,
+        "preco_total_min": 1604394.62,
+        "preco_total_max": 1878116.61
+      },
+      {
+        "ano": 2030,
+        "preco_m2_estimado": 15699.78,
+        "preco_m2_min": 15196.62,
+        "preco_m2_max": 16202.94,
+        "preco_total_estimado": 1792466.26,
+        "preco_total_min": 1636053.7,
+        "preco_total_max": 1948878.83
+      }
+    ]
+  }
 }

@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="CorretorIA - Inteligência de Precificação Imobiliária (SI-PI6)",
     description="Sistema inteligente de apoio à decisão e precificação para corretores (São Paulo & Santa Catarina).",
-    version="2.0.0",
+    version="3.0.0",
     lifespan=lifespan
 )
 
@@ -55,7 +55,7 @@ def health_check():
     return {
         "status": "online",
         "modulo_ia": "operacional",
-        "versao": "2.0.0-sprint2",
+        "versao": "3.0.0-sprint3",
         "estados_suportados": ["SP", "SC"],
         "metricas": engine.metrics
     }
@@ -119,10 +119,37 @@ def get_locations(estado: Optional[str] = Query(default=None, description="Filtr
 @app.get("/api/benchmark")
 def get_benchmark():
     """
-    Retorna os resultados didáticos da Validação Cruzada (5-Fold)
-    comparando os 3 modelos: Regressão Linear, Árvore de Decisão e Random Forest.
+    Retorna os resultados do GridSearchCV (5-Fold) nos 90% de treino
+    e métricas avaliadas no conjunto de teste cru (10% isolado)
+    comparando os 5 modelos: Ridge, Árvore de Decisão, Random Forest, XGBoost e Rede Neural MLP.
     """
     return engine.get_benchmark_results()
+
+
+@app.get("/api/yearly-trends")
+def get_yearly_trends(estado: Optional[str] = Query(default=None, description="Filtrar por UF (SP ou SC)")):
+    """
+    Retorna a série histórica anual (2013-2026) e a estimação de futuro (2027-2030)
+    para São Paulo (SP) e Santa Catarina (SC).
+    """
+    bench = engine.get_benchmark_results()
+    hist = bench.get("serie_anual_historica", {})
+    fut = bench.get("projecao_futura_anual", {})
+
+    if estado:
+        uf = estado.upper()
+        if uf not in ["SP", "SC"]:
+            raise HTTPException(status_code=400, detail=f"Estado '{estado}' não suportado.")
+        return {
+            "estado": uf,
+            "historico_anual": hist.get(uf, []),
+            "estimacao_futuro": fut.get(uf, [])
+        }
+
+    return {
+        "historico_anual": hist,
+        "estimacao_futuro": fut
+    }
 
 
 @app.post("/api/predict")
