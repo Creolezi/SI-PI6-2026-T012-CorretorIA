@@ -27,6 +27,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
 DATA_PATH = os.path.join(PROJECT_ROOT, "data", "dataset_sp_imoveis.csv")
 BENCHMARK_OUTPUT = os.path.join(CURRENT_DIR, "benchmark_results.json")
 MODEL_OUTPUT = os.path.join(CURRENT_DIR, "saved_pricing_model.joblib")
+ESTADOS_ATIVOS = ["SP", "SC", "MG", "RJ", "DF", "PR"]
 
 
 def get_preprocessor(cat_features, num_features):
@@ -47,16 +48,18 @@ def _clean_param_names(params: dict) -> dict:
     return cleaned
 
 
-def compute_yearly_trends_and_future(df: pd.DataFrame, future_years=(2027, 2028, 2029, 2030)):
+def compute_yearly_trends_and_future(df: pd.DataFrame, future_years=tuple(range(2027, 2036))):
     """
-    Calcula a série histórica anual (2013-2026) por estado (SP e SC)
-    e ajusta tendência linear para estimar os próximos anos (2027-2030).
+    Calcula a série histórica anual (2013-2026) por estado (SP, SC, MG, RJ, DF, PR)
+    e ajusta tendência linear para estimar os próximos anos (2027-2035).
     """
     serie_historica = {}
     projecao_futura = {}
 
-    for uf in ["SP", "SC"]:
+    for uf in ESTADOS_ATIVOS:
         df_uf = df[df["estado"] == uf]
+        if df_uf.empty:
+            continue
         yearly = (
             df_uf.groupby("ano_transacao")
             .agg(
@@ -125,7 +128,9 @@ def run_gridsearch_benchmark(cv_folds=5, test_size=0.10):
         raise FileNotFoundError(f"Dataset não encontrado em {DATA_PATH}")
 
     df = pd.read_csv(DATA_PATH)
-    print(f"Base total carregada: {len(df):,} registros (SP: {(df['estado']=='SP').sum():,} | SC: {(df['estado']=='SC').sum():,})")
+    contagem_estados = {uf: int((df["estado"] == uf).sum()) for uf in ESTADOS_ATIVOS}
+    resumo_txt = " | ".join(f"{uf}: {qtd:,}" for uf, qtd in contagem_estados.items())
+    print(f"Base total carregada: {len(df):,} registros ({resumo_txt})")
 
     features_cat = ["estado", "cidade", "bairro", "tipo"]
     features_num = ["area_m2", "idade_imovel", "quartos", "banheiros", "vagas", "ano_transacao"]
@@ -274,14 +279,15 @@ def run_gridsearch_benchmark(cv_folds=5, test_size=0.10):
     print(f" R² Teste Cru: {best_model_info['r2_pct']}% | MAE: R$ {best_model_info['mae_medio']:,.2f} | MAPE: {best_model_info['mape_medio_pct']}%")
     print("=" * 75)
 
-    # Série histórica anual (2013-2026) e estimação futura (2027-2030)
+    # Série histórica anual (2013-2026) e estimação futura (2027-2035)
     serie_historica, projecao_futura = compute_yearly_trends_and_future(df)
 
     output_data = {
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
         "total_amostras": len(df),
-        "amostras_sp": int((df["estado"] == "SP").sum()),
-        "amostras_sc": int((df["estado"] == "SC").sum()),
+        "amostras_por_estado": contagem_estados,
+        "amostras_sp": contagem_estados.get("SP", 0),
+        "amostras_sc": contagem_estados.get("SC", 0),
         "n_folds": cv_folds,
         "holdout_info": {
             "treino_cv_pct": int((1.0 - test_size) * 100),

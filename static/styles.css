@@ -1019,7 +1019,7 @@ input[type="range"] {
 
 .future-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 }
 
@@ -1035,6 +1035,11 @@ input[type="range"] {
   border-radius: var(--radius-sm);
   padding: 10px 8px;
   text-align: center;
+}
+
+.future-card.is-selected {
+  border: 2px solid #2563eb;
+  background: #dbeafe;
 }
 
 .future-year {

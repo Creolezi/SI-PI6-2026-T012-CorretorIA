@@ -1,0 +1,74 @@
+[
+  {
+    "id": "rj_leblon",
+    "cidade": "Rio de Janeiro",
+    "nome": "Leblon",
+    "zona": "Zona Sul",
+    "preco_m2_base": 23200,
+    "valorizacao_anual": 0.058,
+    "descricao": "Um dos metros quadrados mais valorizados do país, com praia nobre, gastronomia e altíssima escassez de oferta."
+  },
+  {
+    "id": "rj_ipanema",
+    "cidade": "Rio de Janeiro",
+    "nome": "Ipanema",
+    "zona": "Zona Sul",
+    "preco_m2_base": 21800,
+    "valorizacao_anual": 0.057,
+    "descricao": "Icônico bairro carioca com forte atratividade internacional, liquidez premium e proximidade à Lagoa."
+  },
+  {
+    "id": "rj_lagoa",
+    "cidade": "Rio de Janeiro",
+    "nome": "Lagoa",
+    "zona": "Zona Sul",
+    "preco_m2_base": 16500,
+    "valorizacao_anual": 0.052,
+    "descricao": "Entorno da Lagoa Rodrigo de Freitas com apartamentos amplos, vista privilegiada e perfil familiar de alto padrão."
+  },
+  {
+    "id": "rj_botafogo",
+    "cidade": "Rio de Janeiro",
+    "nome": "Botafogo",
+    "zona": "Zona Sul",
+    "preco_m2_base": 13400,
+    "valorizacao_anual": 0.054,
+    "descricao": "Hub gastronômico, corporativo e de inovação da Zona Sul com metrô integrado e novos lançamentos."
+  },
+  {
+    "id": "rj_copacabana",
+    "cidade": "Rio de Janeiro",
+    "nome": "Copacabana",
+    "zona": "Zona Sul",
+    "preco_m2_base": 12100,
+    "valorizacao_anual": 0.046,
+    "descricao": "Maior liquidez turística do Rio, forte demanda para temporada e imóveis residenciais próximos à orla."
+  },
+  {
+    "id": "rj_barra_tijuca",
+    "cidade": "Rio de Janeiro",
+    "nome": "Barra da Tijuca",
+    "zona": "Zona Oeste",
+    "preco_m2_base": 13800,
+    "valorizacao_anual": 0.059,
+    "descricao": "Grandes condomínios fechados com infraestrutura completa de lazer, segurança e proximidade com a praia."
+  },
+  {
+    "id": "rj_tijuca",
+    "cidade": "Rio de Janeiro",
+    "nome": "Tijuca",
+    "zona": "Zona Norte",
+    "preco_m2_base": 7900,
+    "valorizacao_anual": 0.042,
+    "descricao": "Bairro tradicional bem servido pelo metrô e comércio consolidado, com excelente custo-benefício."
+  },
+  {
+    "id": "rj_icarai",
+    "cidade": "Niterói",
+    "nome": "Icaraí",
+    "zona": "Zona Sul",
+    "preco_m2_base": 11400,
+    "valorizacao_anual": 0.052,
+    "descricao": "Principal endereço nobre de Niterói, à beira da Praia de Icaraí, com alta qualidade de vida."
+  }
+]

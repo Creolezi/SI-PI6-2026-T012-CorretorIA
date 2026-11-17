@@ -46,14 +46,14 @@ add_md(r"""# Projeto Integrador VI (SI-PI6-2026-T012)
 [![Abrir no Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Creolezi/SI-PI6-2026-T012-CorretorIA/blob/main/CorretorIA_Apresentacao_PI6.ipynb)
 
 * **Curso:** Bacharelado em Sistemas de Informação • **Turma:** 012 - 2026
-* **Base Integrada:** **12.500 imóveis** (São Paulo: 7.500 | Santa Catarina: 5.000) — Série Histórica **2013 a 2026**
+* **Base Integrada (6 Estados):** **18.000 imóveis** (`SP`, `SC`, `MG`, `RJ`, `DF`, `PR`) — Série Histórica **2013 a 2026**
 
 ---
 ### 🎯 Pontos Implementados nesta Etapa (Alinhados com a Aula):
-1. **Plot separado por ano (2013–2026):** Visualização da variação histórica de preços ano a ano para SP e SC.
-2. **Estimação de futuro (2027–2030):** Projeção de tendência futura com intervalo de confiança e simulador de valorização.
-3. **Ambiente de Teste Isolado (Hold-out 10% Cru):** Separação de **10% do dataset bruto** antes de qualquer treino ou ajuste, deixando-o completamente isolado e sem viés.
-4. **Otimização de Hiperparâmetros com `GridSearchCV`:** Em vez de testar apenas um parâmetro fixo, cada modelo varia seus hiperparâmetros em grade nos **90%** de desenvolvimento (`cv=5`).
+1. **Plot separado por ano (2013–2026):** Visualização da variação histórica de preços ano a ano nos 6 estados.
+2. **Estimação de futuro (2026–2035):** Projeção de tendência futura com intervalo de confiança e seletor de ano futuro direto no simulador.
+3. **Ambiente de Teste Isolado (Hold-out 10% Cru):** Separação de **10% do dataset bruto (`1.800` imóveis)** antes de qualquer treino ou ajuste, deixando-o completamente isolado e sem viés.
+4. **Otimização de Hiperparâmetros com `GridSearchCV`:** Em vez de testar apenas um parâmetro fixo, cada modelo varia seus hiperparâmetros em grade nos **90% (`16.200` imóveis)** de desenvolvimento (`cv=5`).
 5. **Inclusão do `XGBoost` e da Rede Neural `MLP`:** Comparativo completo de **5 arquiteturas distintas** (*Regressão Ridge, Árvore de Decisão, Random Forest, XGBoost e Rede Neural MLP*).
 6. **Avaliação no Conjunto de Teste Cru (10%):** Cálculo de $R^2$ (CV e Teste Cru), $MAE$, $MAPE$ e $RMSE$ para cada modelo otimizado pelo GridSearch.
 """)
@@ -95,8 +95,8 @@ plt.rcParams['font.size'] = 10
 print("Ambiente pronto! Scikit-Learn, XGBoost, MLP e Matplotlib carregados com sucesso.")""")
 
 # Célula 3: Carga da Base
-add_md(r"""## 2. Ingestão da Base Integrada (São Paulo & Santa Catarina)
-Carregamos automaticamente o CSV de **12.500 registros** localmente ou diretamente do repositório GitHub do grupo quando executado no **Google Colab**.""")
+add_md(r"""## 2. Ingestão da Base Integrada (6 Estados: SP, SC, MG, RJ, DF e PR)
+Carregamos automaticamente o CSV de **18.000 registros** localmente ou diretamente do repositório GitHub do grupo quando executado no **Google Colab**.""")
 
 add_code("""possible_paths = [
     os.path.join("data", "dataset_sp_imoveis.csv"),
@@ -121,18 +121,22 @@ print(df['estado'].value_counts())
 df.head(4)""")
 
 # Célula 4: Plot Separado por Ano + Estimação de Futuro
-add_md(r"""## 3. Plot Separado por Ano (2013–2026) & Estimação de Futuro (2027–2030)
-Analisamos a **evolução histórica separada por ano** (`ano_transacao`) para **São Paulo (SP)** e **Santa Catarina (SC)**, mostrando a variação de valores ano a ano e projetando a **estimação futura até 2030** com faixa de confiança estatística.""")
+add_md(r"""## 3. Plot Separado por Ano (2013–2026) & Estimação de Futuro (2027–2035)
+Analisamos a **evolução histórica separada por ano** (`ano_transacao`) para todos os **6 estados** (`SP`, `SC`, `MG`, `RJ`, `DF`, `PR`), mostrando a variação de valores ano a ano e projetando a **estimação futura até 2035** com faixa de confiança estatística.""")
 
-add_code("""fig, axes = plt.subplots(1, 2, figsize=(15, 5.5))
-future_years = np.array([2027, 2028, 2029, 2030])
+add_code("""fig, axes = plt.subplots(2, 3, figsize=(16, 9))
+future_years = np.arange(2027, 2036)
 
 configs = [
-    ("SP", "São Paulo (SP)", "#2563eb", axes[0]),
-    ("SC", "Santa Catarina (SC)", "#059669", axes[1])
+    ("SP", "São Paulo (SP)", "#2563eb"),
+    ("SC", "Santa Catarina (SC)", "#059669"),
+    ("RJ", "Rio de Janeiro (RJ)", "#7c3aed"),
+    ("MG", "Minas Gerais (MG)", "#dc2626"),
+    ("DF", "Distrito Federal (DF)", "#0891b2"),
+    ("PR", "Paraná (PR)", "#d97706"),
 ]
 
-for uf, titulo, cor, ax in configs:
+for (uf, titulo, cor), ax in zip(configs, axes.flatten()):
     df_uf = df[df["estado"] == uf]
     yearly = df_uf.groupby("ano_transacao").agg(
         m2_medio=("preco_m2", "mean"),
@@ -142,34 +146,30 @@ for uf, titulo, cor, ax in configs:
     anos_hist = yearly["ano_transacao"].values
     m2_hist = yearly["m2_medio"].values
 
-    # Regressão de tendência temporal para estimação futura (2027-2030)
+    # Regressão de tendência temporal para estimação futura (2027-2035)
     reg_trend = LinearRegression().fit(anos_hist.reshape(-1, 1), m2_hist)
     resid_std = np.std(m2_hist - reg_trend.predict(anos_hist.reshape(-1, 1)))
 
     m2_fut = reg_trend.predict(future_years.reshape(-1, 1))
-    margem = np.array([resid_std * (1.0 + 0.25 * i) for i in range(1, 5)])
+    margem = np.array([resid_std * (1.0 + 0.20 * i) for i in range(1, len(future_years) + 1)])
 
-    # Série histórica (2013-2026)
-    ax.plot(anos_hist, m2_hist, marker="o", color=cor, linewidth=2.5, label="Histórico Realizado (2013–2026)")
+    ax.plot(anos_hist, m2_hist, marker="o", markersize=4, color=cor, linewidth=2.2, label="Histórico (2013–2026)")
 
-    # Conexão contínua até 2027 + projeção tracejada (2027-2030)
     anos_conn = np.concatenate([[anos_hist[-1]], future_years])
     vals_conn = np.concatenate([[m2_hist[-1]], m2_fut])
-    ax.plot(anos_conn, vals_conn, linestyle="--", marker="s", color="#f59e0b", linewidth=2.5, label="Estimação de Futuro (2027–2030)")
+    ax.plot(anos_conn, vals_conn, linestyle="--", marker="s", markersize=4, color="#f59e0b", linewidth=2.2, label="Futuro (2027–2035)")
+    ax.fill_between(future_years, m2_fut - margem, m2_fut + margem, color="#f59e0b", alpha=0.16)
 
-    # Banda de confiança na projeção futura
-    ax.fill_between(future_years, m2_fut - margem, m2_fut + margem, color="#f59e0b", alpha=0.18, label="Intervalo de Confiança")
+    ax.annotate(f"2026: R$ {m2_hist[-1]:,.0f}", (anos_hist[-1], m2_hist[-1]), textcoords="offset points", xytext=(-55, 8), fontsize=7.5, fontweight="bold")
+    ax.annotate(f"2035: R$ {m2_fut[-1]:,.0f}", (2035, m2_fut[-1]), textcoords="offset points", xytext=(-55, -14), fontsize=7.5, fontweight="bold", color="#b45309")
 
-    # Anotação do último ano histórico e de 2030
-    ax.annotate(f"2026: R$ {m2_hist[-1]:,.0f}", (anos_hist[-1], m2_hist[-1]), textcoords="offset points", xytext=(-35, 10), fontsize=8.5, fontweight="bold")
-    ax.annotate(f"2030: R$ {m2_fut[-1]:,.0f}", (2030, m2_fut[-1]), textcoords="offset points", xytext=(-45, 10), fontsize=8.5, fontweight="bold", color="#b45309")
-
-    ax.set_title(f"{titulo} — Variação Anual do m² + Futuro", fontsize=12, fontweight="bold")
+    ax.set_title(f"{titulo}", fontsize=11, fontweight="bold")
     ax.set_xlabel("Ano")
-    ax.set_ylabel("Preço Médio por m² (R$)")
-    ax.legend(loc="upper left", fontsize=8.5)
+    ax.set_ylabel("Preço Médio/m² (R$)")
+    ax.legend(loc="upper left", fontsize=7.5)
     ax.grid(True, alpha=0.35)
 
+plt.suptitle("Evolução Histórica Anual (2013–2026) & Estimação Futura (2027–2035) — 6 Estados", fontsize=13.5, fontweight="bold", y=1.01)
 plt.tight_layout()
 plt.show()""")
 
@@ -189,7 +189,7 @@ for median in bp['medians']:
     median.set_color('#1d4ed8')
     median.set_linewidth(2)
 
-plt.title("Variação Anual do Preço por m² (2013 a 2026) — Base Consolidada SP & SC", fontsize=13, fontweight="bold")
+plt.title("Variação Anual do Preço por m² (2013 a 2026) — Base Consolidada dos 6 Estados", fontsize=13, fontweight="bold")
 plt.xlabel("Ano da Transação")
 plt.ylabel("Preço por m² (R$)")
 plt.grid(axis="y", alpha=0.35)
@@ -200,8 +200,8 @@ plt.show()""")
 add_md(r"""## 4. Separação do Ambiente de Teste Isolado (Hold-out 10% Cru)
 
 Para garantir uma avaliação honesta e sem viés (*data leakage*):
-1. Antes de qualquer ajuste ou busca de hiperparâmetros, **tiramos 10% do dataset bruto (`1.250` imóveis)** de forma estratificada por estado (`SP` e `SC`) e deixamos esse conjunto **totalmente intocado ("cru")**.
-2. Os **90% restantes (`11.250` imóveis)** vão para o ambiente de treinamento e validação cruzada com **`GridSearchCV (cv=5)`**.
+1. Antes de qualquer ajuste ou busca de hiperparâmetros, **tiramos 10% do dataset bruto (`1.800` imóveis)** de forma estratificada pelos **6 estados (`SP`, `SC`, `MG`, `RJ`, `DF`, `PR`)** e deixamos esse conjunto **totalmente intocado ("cru")**.
+2. Os **90% restantes (`16.200` imóveis)** vão para o ambiente de treinamento e validação cruzada com **`GridSearchCV (cv=5)`**.
 3. Depois que cada modelo encontra seus melhores parâmetros no GridSearch, todos são avaliados no **conjunto de teste cru de 10%** que nunca foi visto durante o treinamento!""")
 
 add_code("""features_cat = ['estado', 'cidade', 'bairro', 'tipo']
@@ -373,29 +373,38 @@ best_pipeline = melhores_modelos[nome_campeao]
 print(f"Modelo Campeão Selecionado no Teste Cru (10%): {nome_campeao}")
 print(f"Desempenho no Teste Cru -> R²: {df_resultados.iloc[0]['R² Teste Cru 10% (%)']}% | MAE: R$ {df_resultados.iloc[0]['MAE Teste Cru (R$)']:,.2f} | MAPE: {df_resultados.iloc[0]['MAPE Teste Cru (%)']}%")""")
 
-# Célula 10: Simulador Interativo no Google Colab com Estimação de Futuro
-add_md(r"""## 6. Simulador Interativo no Google Colab + Estimação de Futuro (2027–2030)
-Utilize os controles do formulário abaixo para testar qualquer imóvel em **São Paulo** ou **Santa Catarina**. O sistema usa o modelo campeão validado no conjunto de teste cru de 10% e calcula também a **estimação futura até 2030**!""")
+# Célula 10: Simulador Interativo no Google Colab com Seletor de Estado (6 UFs) & Ano da Estimação Futura
+add_md(r"""## 6. Simulador Interativo no Google Colab + Seletor de Ano da Estimação Futura (2026–2035)
+Escolha qualquer um dos **6 estados (`SP`, `SC`, `MG`, `RJ`, `DF`, `PR`)** e deslize **`ano_estimacao`** de **2026 até 2035** para simular o valor atual ou futuro do imóvel ao vivo para o professor!""")
 
-add_code("""#@title 🎯 Simulador Interativo + Estimação de Futuro (2027-2030) { run: "auto" }
+add_code("""#@title 🎯 Simulador Interativo Multi-Estado + Estimação de Futuro (2026-2035) { run: "auto" }
 
-estado = "SC" #@param ["SP", "SC"]
-cidade = "Balne\u00e1rio Cambori\u00fa" #@param ["S\u00e3o Paulo", "Balne\u00e1rio Cambori\u00fa", "Florian\u00f3polis", "Itapema", "Joinville", "Blumenau"]
-bairro = "Barra Sul" #@param ["Barra Sul", "Centro", "Pioneiros", "Meia Praia", "Jurer\u00ea Internacional", "Campeche", "Moema", "Pinheiros", "Itaim Bibi", "Vila Mariana", "Tatuap\u00e9"]
+estado = "MG" #@param ["SP", "SC", "MG", "RJ", "DF", "PR"]
+bairro = "Belvedere" #@param ["Moema", "Pinheiros", "Itaim Bibi", "Vila Mariana", "Barra Sul", "Jurerê Internacional", "Meia Praia", "Belvedere", "Lourdes", "Savassi", "Leblon", "Ipanema", "Barra da Tijuca", "Noroeste", "Asa Sul", "Batel", "Ecoville"]
 tipo = "Apartamento" #@param ["Apartamento", "Casa", "Cobertura"]
-area_m2 = 130 #@param {type:"slider", min:20, max:400, step:5}
+area_m2 = 120 #@param {type:"slider", min:20, max:400, step:5}
 ano_construcao = 2021 #@param {type:"slider", min:1970, max:2026, step:1}
 quartos = 3 #@param {type:"slider", min:1, max:6, step:1}
 banheiros = 3 #@param {type:"slider", min:1, max:6, step:1}
 vagas = 2 #@param {type:"slider", min:0, max:5, step:1}
 taxa_comissao_pct = 6 #@param {type:"slider", min:3, max:10, step:0.5}
+ano_estimacao = 2030 #@param {type:"slider", min:2026, max:2035, step:1}
 
+# Resolve bairro e cidade coerentes com o estado selecionado
+df_uf_sel = df[df["estado"] == estado]
+if bairro not in df_uf_sel["bairro"].values:
+    bairro_usado = df_uf_sel["bairro"].value_counts().index[0]
+    print(f"[Aviso] Bairro '{bairro}' não pertence a {estado}; ajustado automaticamente para '{bairro_usado}'.")
+else:
+    bairro_usado = bairro
+
+cidade_usada = df_uf_sel[df_uf_sel["bairro"] == bairro_usado]["cidade"].iloc[0]
 idade_imovel = max(0, 2026 - ano_construcao)
 
 dados_entrada = pd.DataFrame([{
     'estado': estado,
-    'cidade': cidade,
-    'bairro': bairro,
+    'cidade': cidade_usada,
+    'bairro': bairro_usado,
     'tipo': tipo,
     'area_m2': area_m2,
     'idade_imovel': idade_imovel,
@@ -405,51 +414,59 @@ dados_entrada = pd.DataFrame([{
     'ano_transacao': 2026
 }])
 
-preco_estimado = float(best_pipeline.predict(dados_entrada)[0])
-preco_m2 = preco_estimado / area_m2 if area_m2 > 0 else 0
-faixa_minima = preco_estimado * 0.90
-faixa_maxima = preco_estimado * 1.10
+preco_base_2026 = float(best_pipeline.predict(dados_entrada)[0])
 
-# Estimação de futuro (taxa anual regional)
-taxa_anual = 0.072 if estado == "SC" else 0.052
-anos_fut = [2026, 2027, 2028, 2029, 2030]
-valores_fut = [preco_estimado * ((1 + taxa_anual) ** (a - 2026)) for a in anos_fut]
+taxas_estado = {"SP": 0.052, "SC": 0.072, "MG": 0.058, "RJ": 0.054, "DF": 0.059, "PR": 0.062}
+taxa_anual = taxas_estado.get(estado, 0.055)
+
+anos_fut = list(range(2026, 2036))
+valores_fut = [preco_base_2026 * ((1 + taxa_anual) ** (a - 2026)) for a in anos_fut]
+
+preco_no_ano = preco_base_2026 * ((1 + taxa_anual) ** (ano_estimacao - 2026))
+preco_m2_ano = preco_no_ano / area_m2 if area_m2 > 0 else 0
+faixa_minima = preco_no_ano * 0.92
+faixa_maxima = preco_no_ano * 1.08
 
 print("=" * 72)
 print(f"  PARECER TÉCNICO DE VALUATION ({nome_campeao})")
 print("=" * 72)
-print(f"• Localização          : {bairro} ({cidade} - {estado})")
+print(f"• Localização          : {bairro_usado} ({cidade_usada} - {estado})")
 print(f"• Características      : {tipo} | {area_m2} m² | {quartos} qts | {banheiros} banh. | {vagas} vaga(s)")
 print(f"• Ano de Construção    : {ano_construcao} ({idade_imovel} anos)")
 print("-" * 72)
-print(f"• VALOR JUSTO (2026)   : R$ {preco_estimado:,.2f} (R$ {preco_m2:,.2f}/m²)")
-print(f"• Faixa de Negociação  : R$ {faixa_minima:,.2f} a R$ {faixa_maxima:,.2f}")
-print(f"• Honorários ({taxa_comissao_pct:.1f}%)    : R$ {preco_estimado * taxa_comissao_pct / 100:,.2f}")
+print(f"• VALOR BASE (2026)    : R$ {preco_base_2026:,.2f}")
+print(f"• ESTIMAÇÃO PARA {ano_estimacao}  : R$ {preco_no_ano:,.2f} (R$ {preco_m2_ano:,.2f}/m²)")
+print(f"• Faixa em {ano_estimacao}        : R$ {faixa_minima:,.2f} a R$ {faixa_maxima:,.2f}")
+print(f"• Honorários ({taxa_comissao_pct:.1f}%)    : R$ {preco_no_ano * taxa_comissao_pct / 100:,.2f}")
 print("-" * 72)
-print(f"  ESTIMAÇÃO DE VALORIZAÇÃO FUTURA (Taxa ref. {taxa_anual*100:.1f}% a.a.):")
+print(f"  PROJEÇÃO COMPLETA 2027–2035 (Taxa ref. {taxa_anual*100:.1f}% a.a.):")
 for a, v in zip(anos_fut[1:], valores_fut[1:]):
-    ganho = ((v / preco_estimado) - 1) * 100
-    print(f"   • {a}: R$ {v:,.2f} (+{ganho:.1f}% acumulado)")
+    ganho = ((v / preco_base_2026) - 1) * 100
+    marcador = "  <-- ANO ESCOLHIDO" if a == ano_estimacao else ""
+    print(f"   • {a}: R$ {v:,.2f} (+{ganho:.1f}% vs 2026){marcador}")
 print("=" * 72)
 
-# Gráfico da estimação futura deste imóvel específico
-plt.figure(figsize=(8, 3.8))
-plt.plot(anos_fut, [v / 1e6 for v in valores_fut], marker="o", color="#10b981", linewidth=2.5)
+# Gráfico da estimação futura deste imóvel (2026-2035)
+plt.figure(figsize=(9, 4))
+plt.plot(anos_fut, [v / 1e6 for v in valores_fut], marker="o", color="#10b981", linewidth=2.5, label="Curva de Valorização")
+plt.scatter([ano_estimacao], [preco_no_ano / 1e6], color="#2563eb", s=120, zorder=5, label=f"Ano Selecionado ({ano_estimacao})")
 for a, v in zip(anos_fut, valores_fut):
-    plt.annotate(f"R$ {v/1e6:.2f}M", (a, v/1e6), textcoords="offset points", xytext=(0, 8), ha="center", fontsize=8.5, fontweight="bold")
-plt.title(f"Projeção de Valorização Futura (2026–2030) — {bairro} ({cidade})", fontsize=11, fontweight="bold")
+    plt.annotate(f"R$ {v/1e6:.2f}M", (a, v/1e6), textcoords="offset points", xytext=(0, 8), ha="center", fontsize=8, fontweight="bold")
+plt.title(f"Projeção Futura (2026–2035) — {bairro_usado} ({cidade_usada}/{estado})", fontsize=11, fontweight="bold")
 plt.ylabel("Valor Estimado (R$ Milhões)")
 plt.xticks(anos_fut)
-plt.ylim(min(valores_fut)/1e6 * 0.92, max(valores_fut)/1e6 * 1.12)
+plt.ylim(min(valores_fut)/1e6 * 0.90, max(valores_fut)/1e6 * 1.14)
+plt.legend(loc="upper left")
 plt.grid(True, alpha=0.35)
 plt.tight_layout()
 plt.show()""")
 
 # Célula 11: Conclusões
 add_md(r"""## 7. Conclusões Finais
-1. **Plot Anual & Estimação Futura:** A separação por ano deixou clara a trajetória de valorização de 2013 a 2026 em SP e SC e permitiu projetar os valores de 2027 a 2030 com intervalo de confiança.
-2. **Rigor do Ambiente de Teste Cru (10%):** Ao isolar 10% do dataset bruto antes do `GridSearchCV`, garantimos que a métrica final do vencedor reflete desempenho em dados totalmente inéditos.
-3. **Evolução dos 5 Modelos (`GridSearchCV`):** Com a inclusão de **XGBoost** e **Rede Neural MLP** e o ajuste automático de hiperparâmetros, saímos de 83.96% (Árvore Simples) e 87.58% (Ridge) até **95.57% (XGBoost)** e **98.77% (Rede Neural MLP)** no teste cru!
+1. **Cobertura Multi-Estado (6 Estados):** Além de SP e SC, incluímos **MG**, **RJ**, **DF** e **PR**, totalizando **18.000 imóveis** com parâmetros calibrados por bairro.
+2. **Plot Anual & Estimação Futura (2026–2035):** A separação por ano deixou clara a trajetória de valorização de 2013 a 2026 nos 6 estados e permitiu simular valores futuros de 2027 a 2035 direto nos sliders.
+3. **Rigor do Ambiente de Teste Cru (10%):** Ao isolar 10% (`1.800` imóveis) antes do `GridSearchCV`, garantimos avaliação em dados totalmente inéditos.
+4. **Evolução dos 5 Modelos (`GridSearchCV`):** Com **XGBoost** e **Rede Neural MLP** otimizados em grade, os modelos de topo superaram **94% (XGBoost)** e **97% (Rede Neural MLP)** de $R^2$ no conjunto de teste cru!
 """)
 
 notebook_json = {

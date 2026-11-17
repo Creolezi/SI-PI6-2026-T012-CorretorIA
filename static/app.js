@@ -1,9 +1,18 @@
 /**
  * CorretorIA - Frontend Controller
- * Projeto Integrador 6 - SI-PI6-2026-T012 - Sprint 2 (SP & SC)
+ * Projeto Integrador 6 - SI-PI6-2026-T012 - 6 Estados & Estimação Futura (2026-2035)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
+  const STATE_META = {
+    SP: { nome: "São Paulo (SP)", tituloBairro: "Bairro (São Paulo)", mercado: "São Paulo (Capital)", defaultBairro: "Moema" },
+    SC: { nome: "Santa Catarina (SC)", tituloBairro: "Bairro / Cidade (Santa Catarina)", mercado: "Santa Catarina", defaultBairro: "Barra Sul" },
+    MG: { nome: "Minas Gerais (MG)", tituloBairro: "Bairro / Cidade (Minas Gerais)", mercado: "Minas Gerais", defaultBairro: "Belvedere" },
+    RJ: { nome: "Rio de Janeiro (RJ)", tituloBairro: "Bairro / Cidade (Rio de Janeiro)", mercado: "Rio de Janeiro", defaultBairro: "Leblon" },
+    DF: { nome: "Distrito Federal (DF)", tituloBairro: "Região / Bairro (Distrito Federal)", mercado: "Distrito Federal (Brasília)", defaultBairro: "Noroeste" },
+    PR: { nome: "Paraná (PR)", tituloBairro: "Bairro / Cidade (Paraná)", mercado: "Paraná", defaultBairro: "Batel" }
+  };
+
   // Estado local da aplicação
   const state = {
     selectedUf: "SP",
@@ -31,6 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const anoInput = document.getElementById("ano_construcao");
   const anoSlider = document.getElementById("ano-slider");
   const idadeValLabel = document.getElementById("idade-val-label");
+  const anoEstimacaoInput = document.getElementById("ano_estimacao");
+  const anoEstimacaoSlider = document.getElementById("ano-estimacao-slider");
+  const estimacaoValLabel = document.getElementById("estimacao-val-label");
   const margemSlider = document.getElementById("margem-slider");
   const margemValLabel = document.getElementById("margem-val-label");
   const presetBtns = document.querySelectorAll(".preset-btn");
@@ -44,9 +56,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultContent = document.getElementById("result-content");
   const resImovelTitulo = document.getElementById("res-imovel-titulo");
   const resImovelDetalhes = document.getElementById("res-imovel-detalhes");
+  const resHeroLabel = document.getElementById("res-hero-label");
   const resValorJusto = document.getElementById("res-valor-justo");
   const resPrecoM2 = document.getElementById("res-preco-m2");
   const resDiffM2 = document.getElementById("res-diff-m2");
+  const resBase2026Note = document.getElementById("res-base-2026-note");
   const resFaixaMin = document.getElementById("res-faixa-min");
   const resFaixaTarget = document.getElementById("res-faixa-target");
   const resFaixaMax = document.getElementById("res-faixa-max");
@@ -85,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setupEventListeners() {
-    // Alternância de Estado (SP / SC)
+    // Alternância entre os 6 Estados (SP, SC, MG, RJ, DF, PR)
     statePills.forEach((pill) => {
       pill.addEventListener("click", async () => {
         const uf = pill.getAttribute("data-uf");
@@ -95,24 +109,40 @@ document.addEventListener("DOMContentLoaded", () => {
         pill.classList.add("active");
         state.selectedUf = uf;
 
-        // Atualiza labels de contexto
-        if (uf === "SC") {
-          lblEstadoAtivo.textContent = "Santa Catarina (SC)";
-          labelBairroTitulo.textContent = "Bairro / Cidade (Santa Catarina)";
-          marketTitleText.textContent = "Panorama Imobiliário — Santa Catarina (FipeZAP)";
-          yearlyTitleText.textContent = "Variação Anual (2013–2026) & Estimação de Futuro (2027–2030) — SC";
-        } else {
-          lblEstadoAtivo.textContent = "São Paulo (SP)";
-          labelBairroTitulo.textContent = "Bairro (São Paulo)";
-          marketTitleText.textContent = "Panorama Imobiliário — São Paulo (Capital)";
-          yearlyTitleText.textContent = "Variação Anual (2013–2026) & Estimação de Futuro (2027–2030) — SP";
-        }
+        const meta = STATE_META[uf] || STATE_META.SP;
+        lblEstadoAtivo.textContent = meta.nome;
+        labelBairroTitulo.textContent = meta.tituloBairro;
+        marketTitleText.textContent = `Panorama Imobiliário — ${meta.mercado}`;
+        yearlyTitleText.textContent = `Variação Anual (2013–2026) & Estimação de Futuro (2027–2035) — ${uf}`;
 
         await loadLocations();
         await loadMarketSummary();
         await loadYearlyTrends();
       });
     });
+
+    // Sincronização Ano da Estimação Futura (2026-2035)
+    const syncEstimacaoLabel = (ano) => {
+      const diff = ano - 2026;
+      if (estimacaoValLabel) {
+        estimacaoValLabel.textContent = diff <= 0
+          ? "2026 (Valor Atual)"
+          : `${ano} (+${diff} ${diff === 1 ? "ano" : "anos"} no futuro)`;
+      }
+    };
+
+    if (anoEstimacaoInput && anoEstimacaoSlider) {
+      anoEstimacaoInput.addEventListener("input", (e) => {
+        const ano = Math.max(2026, Math.min(2035, Number(e.target.value) || 2026));
+        anoEstimacaoSlider.value = ano;
+        syncEstimacaoLabel(ano);
+      });
+      anoEstimacaoSlider.addEventListener("input", (e) => {
+        const ano = Number(e.target.value);
+        anoEstimacaoInput.value = ano;
+        syncEstimacaoLabel(ano);
+      });
+    }
 
     // Botão de atalho para a seção de benchmark
     if (btnOpenBenchmark) {
@@ -237,17 +267,12 @@ document.addEventListener("DOMContentLoaded", () => {
         bairroSelect.appendChild(opt);
       });
 
-      // Seleciona um bairro padrão por estado
-      if (state.selectedUf === "SC") {
-        if (state.bairrosMap["Barra Sul"]) {
-          bairroSelect.value = "Barra Sul";
-        } else if (state.bairrosMap["Jurerê Internacional"]) {
-          bairroSelect.value = "Jurerê Internacional";
-        }
-      } else {
-        if (state.bairrosMap["Moema"]) {
-          bairroSelect.value = "Moema";
-        }
+      // Seleciona um bairro padrão para o estado ativo
+      const defaultBairro = (STATE_META[state.selectedUf] || {}).defaultBairro;
+      if (defaultBairro && state.bairrosMap[defaultBairro]) {
+        bairroSelect.value = defaultBairro;
+      } else if (state.bairros.length > 0) {
+        bairroSelect.value = state.bairros[0].nome;
       }
 
       bairroSelect.dispatchEvent(new Event("change"));
@@ -421,7 +446,8 @@ document.addEventListener("DOMContentLoaded", () => {
       quartos: Number(document.getElementById("quartos").value),
       banheiros: Number(document.getElementById("banheiros").value),
       vagas: Number(document.getElementById("vagas").value),
-      margem_corretor_pct: state.margemCorretor
+      margem_corretor_pct: state.margemCorretor,
+      ano_estimacao: anoEstimacaoInput ? Number(anoEstimacaoInput.value) : 2026
     };
 
     // UI Loading
@@ -470,7 +496,21 @@ document.addEventListener("DOMContentLoaded", () => {
     resImovelTitulo.textContent = localizacaoTxt;
     resImovelDetalhes.textContent = `${imovel.area_m2} m² • ${imovel.quartos} Dorm. • ${imovel.banheiros} Banheiros • ${imovel.vagas} Vagas • Construído em ${imovel.ano_construcao}`;
 
-    // Valor Central
+    // Valor Central (2026 ou Ano Futuro Selecionado)
+    const anoSelecionado = (res.estimativa_futuro && res.estimativa_futuro.ano_selecionado) || 2026;
+    if (resHeroLabel) {
+      resHeroLabel.textContent = anoSelecionado > 2026
+        ? `Estimação de Valor Futuro para ${anoSelecionado}`
+        : "Valor Justo de Mercado Sugerido (2026)";
+    }
+    if (resBase2026Note && res.estimativa_futuro) {
+      if (anoSelecionado > 2026) {
+        resBase2026Note.style.display = "block";
+        resBase2026Note.textContent = `Base 2026: ${formatCurrency(res.estimativa_futuro.valor_base_2026)} (+${res.estimativa_futuro.valorizacao_ate_ano_selecionado_pct}% até ${anoSelecionado})`;
+      } else {
+        resBase2026Note.style.display = "none";
+      }
+    }
     resValorJusto.textContent = formatCurrency(prec.valor_justo);
     resPrecoM2.textContent = `${formatCurrency(prec.preco_m2)}/m²`;
     
@@ -492,7 +532,7 @@ document.addEventListener("DOMContentLoaded", () => {
     resComissaoMin.textContent = formatCurrency(comm.comissao_faixa_min);
     resComissaoMax.textContent = formatCurrency(comm.comissao_faixa_max);
 
-    // Estimação de Futuro (2027-2030)
+    // Estimação de Futuro (2027-2035)
     if (futureGrid && res.estimativa_futuro) {
       const fut = res.estimativa_futuro;
       if (resTaxaValorizacao) {
@@ -501,7 +541,7 @@ document.addEventListener("DOMContentLoaded", () => {
       futureGrid.innerHTML = "";
       (fut.projecoes || []).forEach((p) => {
         const card = document.createElement("div");
-        card.className = "future-card";
+        card.className = `future-card${p.ano === fut.ano_selecionado ? " is-selected" : ""}`;
         card.innerHTML = `
           <span class="future-year">${p.ano}</span>
           <span class="future-val">${formatCurrency(p.valor_estimado)}</span>

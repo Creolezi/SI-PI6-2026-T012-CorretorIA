@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CorretorIA - Inteligência de Precificação Imobiliária (SP & SC)</title>
+  <title>CorretorIA - Inteligência de Precificação Imobiliária (6 Estados)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
         </div>
         <div>
           <div class="brand-title">Corretor<span>IA</span></div>
-          <div class="brand-subtitle">Valuation Inteligente • São Paulo & Santa Catarina</div>
+          <div class="brand-subtitle">Valuation Inteligente & Futuro • SP, SC, MG, RJ, DF e PR</div>
         </div>
       </div>
 
@@ -54,16 +54,22 @@
       </span>
       <div class="state-pills" id="state-pills-container">
         <button class="state-pill active" data-uf="SP">
-          <span class="pill-dot active"></span> São Paulo (Ativo)
+          <span class="pill-dot active"></span> São Paulo (SP)
         </button>
         <button class="state-pill" data-uf="SC">
-          <span class="pill-dot active"></span> Santa Catarina <span class="pill-tag-new">Novo!</span>
+          <span class="pill-dot active"></span> Santa Catarina (SC)
         </button>
-        <button class="state-pill disabled" data-uf="MG" title="Fase 3 de Expansão">
-          Minas Gerais <span class="pill-tag">Em breve</span>
+        <button class="state-pill" data-uf="MG">
+          <span class="pill-dot active"></span> Minas Gerais (MG) <span class="pill-tag-new">Novo!</span>
         </button>
-        <button class="state-pill disabled" data-uf="RJ" title="Fase 3 de Expansão">
-          Rio de Janeiro <span class="pill-tag">Em breve</span>
+        <button class="state-pill" data-uf="RJ">
+          <span class="pill-dot active"></span> Rio de Janeiro (RJ) <span class="pill-tag-new">Novo!</span>
+        </button>
+        <button class="state-pill" data-uf="DF">
+          <span class="pill-dot active"></span> Distrito Federal (DF) <span class="pill-tag-new">Novo!</span>
+        </button>
+        <button class="state-pill" data-uf="PR">
+          <span class="pill-dot active"></span> Paraná (PR) <span class="pill-tag-new">Novo!</span>
         </button>
       </div>
     </div>
@@ -175,6 +181,20 @@
             </div>
           </div>
 
+          <!-- Ano da Estimação / Projeção Futura (2026-2035) -->
+          <div class="form-group broker-margin-box">
+            <div class="margin-header">
+              <label for="ano_estimacao">
+                📅 Ano da Estimação Futura: <strong id="estimacao-val-label">2026 (Valor Atual)</strong>
+              </label>
+            </div>
+            <div class="input-with-slider">
+              <input type="number" id="ano_estimacao" min="2026" max="2035" value="2026" required>
+              <input type="range" id="ano-estimacao-slider" min="2026" max="2035" step="1" value="2026">
+            </div>
+            <span class="field-hint">Escolha 2026 para valor atual ou avance até 2035 para simular valorização futura.</span>
+          </div>
+
           <!-- Margem / Comissão do Corretor -->
           <div class="form-group broker-margin-box">
             <div class="margin-header">
@@ -242,12 +262,13 @@
 
           <!-- Card de Valor Central -->
           <div class="pricing-hero-box">
-            <div class="hero-label">Valor Justo de Mercado Sugerido</div>
+            <div class="hero-label" id="res-hero-label">Valor Justo de Mercado Sugerido (2026)</div>
             <div class="hero-price" id="res-valor-justo">R$ 1.150.000,00</div>
             <div class="hero-m2">
               Valor do m² calculado: <strong id="res-preco-m2">R$ 15.333,00/m²</strong> 
               <span class="diff-tag" id="res-diff-m2">+2.4% vs. média do bairro</span>
             </div>
+            <div class="hero-base-note" id="res-base-2026-note" style="display: none; margin-top: 8px; font-size: 0.78rem; color: #94a3b8;"></div>
           </div>
 
           <!-- Faixa de Negociação -->
@@ -299,10 +320,10 @@
             </div>
           </div>
 
-          <!-- Card de Estimação de Futuro (2027-2030) -->
+          <!-- Card de Estimação de Futuro (2027-2035) -->
           <div class="future-box" id="future-box">
             <div class="future-header">
-              <span>📈 Estimação de Futuro (Projeção 2027–2030)</span>
+              <span>📈 Estimação de Futuro (Projeção 2027–2035)</span>
               <span class="future-rate-badge">Valorização est. <strong id="res-taxa-valorizacao">+5.5% a.a.</strong></span>
             </div>
             <div class="future-grid" id="future-grid">
@@ -334,7 +355,7 @@
               Benchmark com GridSearchCV + Ambiente de Teste Isolado (10% Hold-out Cru)
             </h2>
             <p class="card-subtitle">
-              90% dos dados (11.250 amostras) usados para ajuste de hiperparâmetros via GridSearchCV (5-Fold) • 10% (1.250 amostras cruas) isolados para teste cego final
+              90% dos dados (16.200 amostras em 6 estados) usados no GridSearchCV (5-Fold) • 10% (1.800 amostras cruas) isolados para teste cego final
             </p>
           </div>
           <span class="badge badge-kfold">5 Modelos • 10% Teste Cru</span>
@@ -368,7 +389,7 @@
           <div class="didactic-tag kfold">Ambiente Isolado</div>
           <h4>Separação 90% / 10% Cru</h4>
           <p class="didactic-desc">
-            Antes de qualquer treino ou ajuste, 10% do dataset bruto (1.250 imóveis) é guardado à parte. Todos os modelos ajustados no GridSearchCV são testados nesses dados inéditos sem viés.
+            Antes de qualquer treino ou ajuste, 10% do dataset bruto (1.800 imóveis) é guardado à parte. Todos os modelos ajustados no GridSearchCV são testados nesses dados inéditos sem viés.
           </p>
         </div>
 
@@ -400,13 +421,13 @@
           <div class="didactic-tag winner">Deep Learning Tabular 🏆</div>
           <h4>Rede Neural MLP</h4>
           <p class="didactic-desc">
-            Perceptron Multicamadas com escalonamento do alvo. Otimizada no GridSearchCV, atingiu a maior acurácia (98.77%) e menor erro (6.24%) no teste cru!
+            Perceptron Multicamadas com escalonamento do alvo. Otimizada no GridSearchCV, atingiu a maior acurácia (97.88%) e menor erro (6.73%) no teste cru!
           </p>
         </div>
       </div>
     </section>
 
-    <!-- Seção de Série Histórica Anual (2013-2026) & Estimação de Futuro (2027-2030) -->
+    <!-- Seção de Série Histórica Anual (2013-2026) & Estimação de Futuro (2027-2035) -->
     <section class="card yearly-trends-section" id="yearly-trends-section">
       <div class="card-header">
         <div class="benchmark-header-wrap">
@@ -416,13 +437,13 @@
                 <path d="M3 3v18h18"></path>
                 <path d="m19 9-5 5-4-4-3 3"></path>
               </svg>
-              <span id="yearly-title-text">Variação Anual (2013–2026) & Estimação de Futuro (2027–2030)</span>
+              <span id="yearly-title-text">Variação Anual (2013–2026) & Estimação de Futuro (2027–2035)</span>
             </h2>
             <p class="card-subtitle">
               Evolução histórica ano a ano do preço médio do m² e projeção de tendência futura para o estado selecionado
             </p>
           </div>
-          <span class="badge badge-status">Série 2013–2030</span>
+          <span class="badge badge-status">Série 2013–2035</span>
         </div>
       </div>
 
@@ -431,7 +452,7 @@
       </div>
       <div class="yearly-legend">
         <span><span class="legend-swatch swatch-hist"></span> Histórico Realizado (2013–2026)</span>
-        <span><span class="legend-swatch swatch-fut"></span> Estimação de Futuro (2027–2030)</span>
+        <span><span class="legend-swatch swatch-fut"></span> Estimação de Futuro (2027–2035)</span>
       </div>
     </section>
 
@@ -442,22 +463,22 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
           </svg>
-          <span id="market-title-text">Panorama Imobiliário — São Paulo & Santa Catarina</span>
+          <span id="market-title-text">Panorama Imobiliário — 6 Estados Brasileiros</span>
         </h2>
         <p class="card-subtitle">Indicadores consolidados da série histórica (2013-2026) utilizados no treinamento do modelo</p>
       </div>
 
       <div class="market-stats-row">
         <div class="stat-card">
-          <div class="stat-number" id="stat-total-amostras">12.500</div>
-          <div class="stat-desc">Amostras Integradas (SP + SC)</div>
+          <div class="stat-number" id="stat-total-amostras">18.000</div>
+          <div class="stat-desc">Amostras Integradas (6 Estados)</div>
         </div>
         <div class="stat-card">
-          <div class="stat-number" id="stat-media-m2">R$ 13.450</div>
+          <div class="stat-number" id="stat-media-m2">R$ 12.600</div>
           <div class="stat-desc">Valor Médio do m² da Região</div>
         </div>
         <div class="stat-card">
-          <div class="stat-number" id="stat-r2-score">98.8%</div>
+          <div class="stat-number" id="stat-r2-score">97.9%</div>
           <div class="stat-desc">R² no Teste Cru (10% Hold-out)</div>
         </div>
         <div class="stat-card">
@@ -490,7 +511,7 @@
   <footer class="app-footer">
     <div class="container footer-content">
       <p><strong>Projeto Integrador 6 (SI-PI6-2026-T012)</strong> • Engenharia de Software e Inteligência Artificial</p>
-      <p class="footer-note">Sistema de Precificação Imobiliária com Aprendizado de Máquina • Cobertura São Paulo & Santa Catarina</p>
+      <p class="footer-note">Sistema de Precificação Imobiliária com Aprendizado de Máquina • Cobertura: SP, SC, MG, RJ, DF e PR</p>
     </div>
   </footer>
 

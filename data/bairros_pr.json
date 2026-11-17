@@ -1,0 +1,65 @@
+[
+  {
+    "id": "pr_batel",
+    "cidade": "Curitiba",
+    "nome": "Batel",
+    "zona": "Região Central",
+    "preco_m2_base": 14600,
+    "valorizacao_anual": 0.068,
+    "descricao": "Bairro mais sofisticado da capital paranaense, concentrando empreendimentos de luxo, shoppings e gastronomia."
+  },
+  {
+    "id": "pr_ecoville",
+    "cidade": "Curitiba",
+    "nome": "Ecoville",
+    "zona": "Zona Oeste",
+    "preco_m2_base": 12800,
+    "valorizacao_anual": 0.064,
+    "descricao": "Região planejada cercada de áreas verdes, com torres residenciais de alto padrão e fácil acesso."
+  },
+  {
+    "id": "pr_bigorrilho",
+    "cidade": "Curitiba",
+    "nome": "Bigorrilho",
+    "zona": "Zona Oeste",
+    "preco_m2_base": 11900,
+    "valorizacao_anual": 0.060,
+    "descricao": "Vizinho ao Parque Barigui, muito procurado por famílias e jovens executivos pela excelente infraestrutura."
+  },
+  {
+    "id": "pr_cabral",
+    "cidade": "Curitiba",
+    "nome": "Cabral",
+    "zona": "Zona Norte",
+    "preco_m2_base": 12100,
+    "valorizacao_anual": 0.061,
+    "descricao": "Bairro nobre tradicional com ruas arborizadas, imóveis amplos e ótima valorização patrimonial."
+  },
+  {
+    "id": "pr_agua_verde",
+    "cidade": "Curitiba",
+    "nome": "Água Verde",
+    "zona": "Região Sul/Central",
+    "preco_m2_base": 11200,
+    "valorizacao_anual": 0.058,
+    "descricao": "Um dos bairros com maior liquidez de Curitiba, combinando serviços completos e apartamentos modernos."
+  },
+  {
+    "id": "pr_centro_civico",
+    "cidade": "Curitiba",
+    "nome": "Centro Cívico",
+    "zona": "Região Central",
+    "preco_m2_base": 10400,
+    "valorizacao_anual": 0.054,
+    "descricao": "Próximo ao Museu Oscar Niemeyer e órgãos públicos, muito valorizado para moradia e escritórios."
+  },
+  {
+    "id": "pr_gleba_palhano",
+    "cidade": "Londrina",
+    "nome": "Gleba Palhano",
+    "zona": "Zona Sul",
+    "preco_m2_base": 9400,
+    "valorizacao_anual": 0.057,
+    "descricao": "Principal polo vertical nobre do norte do Paraná, próximo ao Lago Igapó."
+  }
+]

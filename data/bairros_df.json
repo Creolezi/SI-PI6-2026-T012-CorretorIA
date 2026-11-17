@@ -1,0 +1,56 @@
+[
+  {
+    "id": "df_noroeste",
+    "cidade": "Brasília",
+    "nome": "Noroeste",
+    "zona": "Plano Piloto",
+    "preco_m2_base": 14900,
+    "valorizacao_anual": 0.065,
+    "descricao": "Setor habitacional moderno e sustentável do Plano Piloto, com lançamentos de alto padrão e forte valorização."
+  },
+  {
+    "id": "df_sudoeste",
+    "cidade": "Brasília",
+    "nome": "Sudoeste",
+    "zona": "Plano Piloto",
+    "preco_m2_base": 13800,
+    "valorizacao_anual": 0.061,
+    "descricao": "Bairro consolidado com superquadras arborizadas, alta segurança e proximidade ao Parque da Cidade."
+  },
+  {
+    "id": "df_lago_sul",
+    "cidade": "Brasília",
+    "nome": "Lago Sul",
+    "zona": "Orla do Lago Paranoá",
+    "preco_m2_base": 14200,
+    "valorizacao_anual": 0.059,
+    "descricao": "Região de grandes lotes residenciais, embaixadas e mansões às margens do Lago Paranoá."
+  },
+  {
+    "id": "df_asa_sul",
+    "cidade": "Brasília",
+    "nome": "Asa Sul",
+    "zona": "Plano Piloto",
+    "preco_m2_base": 12400,
+    "valorizacao_anual": 0.055,
+    "descricao": "Eixo tombado tradicional atendido pelo metrô e próximo à Esplanada dos Ministérios."
+  },
+  {
+    "id": "df_asa_norte",
+    "cidade": "Brasília",
+    "nome": "Asa Norte",
+    "zona": "Plano Piloto",
+    "preco_m2_base": 12100,
+    "valorizacao_anual": 0.054,
+    "descricao": "Superquadras tradicionais próximas à UnB, com forte demanda de servidores públicos e estudantes."
+  },
+  {
+    "id": "df_aguas_claras",
+    "cidade": "Brasília",
+    "nome": "Águas Claras",
+    "zona": "Região Administrativa XX",
+    "preco_m2_base": 8900,
+    "valorizacao_anual": 0.052,
+    "descricao": "Cidade verticalizada integrada ao metrô do DF, com alta liquidez e condomínios modernos."
+  }
+]

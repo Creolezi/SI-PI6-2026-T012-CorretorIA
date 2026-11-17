@@ -1,9 +1,9 @@
 """
-Script de Preparação e Geração de Dataset Imobiliário - São Paulo & Santa Catarina
-Projeto Integrador 6 (SI-PI6-2026-T012) - Sprint 2
+Script de Preparação e Geração de Dataset Imobiliário Multi-Estado (SP, SC, MG, RJ, DF, PR)
+Projeto Integrador 6 (SI-PI6-2026-T012)
 
-Gera e unifica bases de dados imobiliárias de São Paulo (SP) e Santa Catarina (SC)
-cobrindo a série histórica de 2013 a 2026 com base em parâmetros reais de mercado (FipeZAP/ITBI).
+Gera e unifica bases imobiliárias de 6 estados brasileiros (18.000 registros)
+cobrindo a série histórica de 2013 a 2026 com base em parâmetros de mercado (FipeZAP/ITBI).
 """
 
 import os
@@ -14,9 +14,16 @@ import pandas as pd
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
-BAIRROS_SP_FILE = os.path.join(DATA_DIR, "bairros_sp.json")
-BAIRROS_SC_FILE = os.path.join(DATA_DIR, "bairros_sc.json")
 OUTPUT_DATASET = os.path.join(DATA_DIR, "dataset_sp_imoveis.csv")
+
+ESTADOS_CONFIG = [
+    {"uf": "SP", "nome": "São Paulo", "file": "bairros_sp.json", "n_samples": 5000, "seed": 42},
+    {"uf": "SC", "nome": "Santa Catarina", "file": "bairros_sc.json", "n_samples": 3500, "seed": 123},
+    {"uf": "RJ", "nome": "Rio de Janeiro", "file": "bairros_rj.json", "n_samples": 3000, "seed": 456},
+    {"uf": "MG", "nome": "Minas Gerais", "file": "bairros_mg.json", "n_samples": 2500, "seed": 789},
+    {"uf": "PR", "nome": "Paraná", "file": "bairros_pr.json", "n_samples": 2000, "seed": 1011},
+    {"uf": "DF", "nome": "Distrito Federal", "file": "bairros_df.json", "n_samples": 2000, "seed": 1213},
+]
 
 
 def load_bairros(filepath):
@@ -30,11 +37,12 @@ def generate_state_data(state_uf, state_name, bairros_list, n_samples, start_id,
     nomes_bairros = list(bairros_dict.keys())
 
     tipos = ["Apartamento", "Casa", "Cobertura"]
-    # Em SC (especialmente litoral), coberturas e apartamentos têm proporção maior
-    if state_uf == "SC":
-        tipo_prob = [0.72, 0.20, 0.08]
+    if state_uf in ("SC", "RJ"):
+        tipo_prob = [0.74, 0.18, 0.08]
+    elif state_uf == "DF":
+        tipo_prob = [0.70, 0.24, 0.06]
     else:
-        tipo_prob = [0.75, 0.20, 0.05]
+        tipo_prob = [0.73, 0.22, 0.05]
 
     tipo_mult = {"Apartamento": 1.0, "Casa": 0.92, "Cobertura": 1.45}
     records = []
@@ -46,7 +54,6 @@ def generate_state_data(state_uf, state_name, bairros_list, n_samples, start_id,
         tipo = np.random.choice(tipos, p=tipo_prob)
 
         # Ano de construção (1975 até 2025)
-        # Mais concentração em anos recentes
         ano_construcao = int(np.random.choice(
             np.arange(1975, 2026),
             p=np.linspace(0.005, 0.035, 51) / np.sum(np.linspace(0.005, 0.035, 51))
@@ -56,12 +63,12 @@ def generate_state_data(state_uf, state_name, bairros_list, n_samples, start_id,
         # Ano de transação/anúncio (2013 a 2026)
         ano_transacao = int(np.random.randint(2013, 2027))
 
-        # Metragem quadrada com distribuição típica
+        # Metragem quadrada
         if tipo == "Apartamento":
             area_m2 = int(np.clip(np.random.exponential(scale=48) + 35, 30, 420))
         elif tipo == "Casa":
             area_m2 = int(np.clip(np.random.exponential(scale=75) + 85, 60, 650))
-        else:  # Cobertura
+        else:
             area_m2 = int(np.clip(np.random.exponential(scale=85) + 130, 120, 800))
 
         # Cômodos proporcionais à metragem
@@ -82,7 +89,7 @@ def generate_state_data(state_uf, state_name, bairros_list, n_samples, start_id,
             banheiros = int(np.random.choice([3, 4, 5], p=[0.25, 0.55, 0.20]))
             vagas = int(np.random.choice([2, 3, 4, 5], p=[0.20, 0.50, 0.20, 0.10]))
 
-        # Fator de idade (depreciação / prêmio de lançamento)
+        # Fator de idade
         if idade_imovel <= 3:
             fator_idade = 1.15
         elif idade_imovel <= 10:
@@ -94,12 +101,11 @@ def generate_state_data(state_uf, state_name, bairros_list, n_samples, start_id,
         else:
             fator_idade = 0.82
 
-        # Fator de vagas de garagem
         fator_vagas = 1.0 + (vagas * 0.05)
         fator_tipo = tipo_mult[tipo]
 
-        # Variação histórica (acumulado 2013-2026)
-        taxa_anual = 0.042 if state_uf == "SP" else 0.055  # SC teve valorização acima da média nacional
+        # Usa a taxa anual do próprio bairro para refletir a variação histórica fiel
+        taxa_anual = float(bairro_info.get("valorizacao_anual", 0.05))
         fator_ano_transacao = 1.0 + ((ano_transacao - 2013) * taxa_anual)
 
         preco_m2_estimado = (
@@ -110,7 +116,7 @@ def generate_state_data(state_uf, state_name, bairros_list, n_samples, start_id,
             * fator_vagas
         )
 
-        ruido = np.random.normal(1.0, 0.06)
+        ruido = np.random.normal(1.0, 0.055)
         preco_m2_final = round(preco_m2_estimado * ruido, 2)
         preco_total = round(preco_m2_final * area_m2, 2)
 
@@ -139,25 +145,23 @@ def main():
     os.makedirs(DATA_DIR, exist_ok=True)
     os.makedirs(os.path.join(DATA_DIR, "raw"), exist_ok=True)
 
-    bairros_sp = load_bairros(BAIRROS_SP_FILE)
-    bairros_sc = load_bairros(BAIRROS_SC_FILE)
+    all_records = []
+    for idx, cfg in enumerate(ESTADOS_CONFIG, start=1):
+        filepath = os.path.join(DATA_DIR, cfg["file"])
+        bairros = load_bairros(filepath)
+        print(f"[{idx}/{len(ESTADOS_CONFIG)}] Gerando {cfg['n_samples']:,} amostras para {cfg['nome']} ({cfg['uf']}) ({len(bairros)} bairros)...")
+        recs = generate_state_data(
+            cfg["uf"], cfg["nome"], bairros,
+            n_samples=cfg["n_samples"], start_id=1, random_seed=cfg["seed"]
+        )
+        all_records.extend(recs)
 
-    print(f"[1/3] Gerando dados de São Paulo (SP): {len(bairros_sp)} bairros...")
-    records_sp = generate_state_data("SP", "São Paulo", bairros_sp, n_samples=7500, start_id=1, random_seed=42)
-
-    print(f"[2/3] Gerando dados de Santa Catarina (SC): {len(bairros_sc)} bairros/cidades...")
-    records_sc = generate_state_data("SC", "Santa Catarina", bairros_sc, n_samples=5000, start_id=1, random_seed=123)
-
-    all_records = records_sp + records_sc
     df = pd.DataFrame(all_records)
-
-    print(f"[3/3] Salvando base unificada em: {OUTPUT_DATASET}")
+    print(f"Salvando base unificada de {len(df):,} registros em: {OUTPUT_DATASET}")
     df.to_csv(OUTPUT_DATASET, index=False, encoding="utf-8")
 
-    print(f"Dataset concluído com sucesso! Total: {len(df):,} registros.")
-    print(f"Distribuição por Estado:\n{df['estado'].value_counts()}\n")
-    print("Amostra das cidades de SC inseridas:")
-    print(df[df["estado"] == "SC"][["cidade", "bairro", "preco_m2", "preco"]].head(4))
+    print("\nResumo por Estado:")
+    print(df["estado"].value_counts())
 
 
 if __name__ == "__main__":

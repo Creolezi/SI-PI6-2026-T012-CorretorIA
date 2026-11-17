@@ -1,14 +1,22 @@
 {
-  "timestamp": "2026-11-16 21:11:43",
-  "total_amostras": 12500,
-  "amostras_sp": 7500,
-  "amostras_sc": 5000,
+  "timestamp": "2026-11-16 22:54:30",
+  "total_amostras": 18000,
+  "amostras_por_estado": {
+    "SP": 5000,
+    "SC": 3500,
+    "MG": 2500,
+    "RJ": 3000,
+    "DF": 2000,
+    "PR": 2000
+  },
+  "amostras_sp": 5000,
+  "amostras_sc": 3500,
   "n_folds": 5,
   "holdout_info": {
     "treino_cv_pct": 90,
     "teste_cru_pct": 10,
-    "amostras_treino_cv": 11250,
-    "amostras_teste_cru": 1250,
+    "amostras_treino_cv": 16200,
+    "amostras_teste_cru": 1800,
     "estratificado_por": "estado"
   },
   "modelo_campeao": "mlp_neural_net",
@@ -22,19 +30,19 @@
       "melhores_parametros": {
         "alpha": 0.001,
         "hidden_layer_sizes": [
-          64,
-          32
+          128,
+          64
         ],
         "learning_rate_init": 0.005
       },
-      "r2_cv_medio": 0.9861,
-      "r2_cv_pct": 98.61,
-      "r2_medio": 0.9877,
-      "r2_pct": 98.77,
-      "mae_medio": 75144.29,
-      "mape_medio_pct": 6.24,
-      "rmse_medio": 132956.46,
-      "tempo_treino_seg": 15.5
+      "r2_cv_medio": 0.9871,
+      "r2_cv_pct": 98.71,
+      "r2_medio": 0.9788,
+      "r2_pct": 97.88,
+      "mae_medio": 75344.86,
+      "mape_medio_pct": 6.73,
+      "rmse_medio": 167369.57,
+      "tempo_treino_seg": 30.82
     },
     {
       "id": "xgboost",
@@ -47,14 +55,14 @@
         "max_depth": 5,
         "n_estimators": 150
       },
-      "r2_cv_medio": 0.9645,
-      "r2_cv_pct": 96.45,
-      "r2_medio": 0.9557,
-      "r2_pct": 95.57,
-      "mae_medio": 94471.28,
-      "mape_medio_pct": 7.02,
-      "rmse_medio": 252241.68,
-      "tempo_treino_seg": 4.98
+      "r2_cv_medio": 0.9641,
+      "r2_cv_pct": 96.41,
+      "r2_medio": 0.9493,
+      "r2_pct": 94.93,
+      "mae_medio": 100465.32,
+      "mape_medio_pct": 7.78,
+      "rmse_medio": 258748.19,
+      "tempo_treino_seg": 8.15
     },
     {
       "id": "random_forest",
@@ -67,14 +75,14 @@
         "min_samples_split": 4,
         "n_estimators": 120
       },
-      "r2_cv_medio": 0.9159,
-      "r2_cv_pct": 91.59,
-      "r2_medio": 0.9168,
-      "r2_pct": 91.68,
-      "mae_medio": 159587.28,
-      "mape_medio_pct": 12.41,
-      "rmse_medio": 345499.69,
-      "tempo_treino_seg": 29.55
+      "r2_cv_medio": 0.9184,
+      "r2_cv_pct": 91.84,
+      "r2_medio": 0.8726,
+      "r2_pct": 87.26,
+      "mae_medio": 179760.35,
+      "mape_medio_pct": 14.82,
+      "rmse_medio": 410108.37,
+      "tempo_treino_seg": 80.6
     },
     {
       "id": "ridge",
@@ -85,14 +93,14 @@
       "melhores_parametros": {
         "alpha": 1.0
       },
-      "r2_cv_medio": 0.8902,
-      "r2_cv_pct": 89.02,
-      "r2_medio": 0.8758,
-      "r2_pct": 87.58,
-      "mae_medio": 220306.01,
-      "mape_medio_pct": 26.17,
-      "rmse_medio": 422186.5,
-      "tempo_treino_seg": 4.05
+      "r2_cv_medio": 0.892,
+      "r2_cv_pct": 89.2,
+      "r2_medio": 0.8516,
+      "r2_pct": 85.16,
+      "mae_medio": 203592.63,
+      "mape_medio_pct": 24.7,
+      "rmse_medio": 442602.36,
+      "tempo_treino_seg": 4.44
     },
     {
       "id": "decision_tree",
@@ -104,215 +112,615 @@
         "max_depth": 16,
         "min_samples_split": 10
       },
-      "r2_cv_medio": 0.8387,
-      "r2_cv_pct": 83.87,
-      "r2_medio": 0.8396,
-      "r2_pct": 83.96,
-      "mae_medio": 215849.67,
-      "mape_medio_pct": 16.3,
-      "rmse_medio": 479909.58,
-      "tempo_treino_seg": 0.69
+      "r2_cv_medio": 0.8661,
+      "r2_cv_pct": 86.61,
+      "r2_medio": 0.8277,
+      "r2_pct": 82.77,
+      "mae_medio": 223602.62,
+      "mape_medio_pct": 17.53,
+      "rmse_medio": 476873.63,
+      "tempo_treino_seg": 1.45
     }
   ],
   "serie_anual_historica": {
     "SP": [
       {
         "ano": 2013,
-        "preco_m2_medio": 8113.4,
-        "preco_m2_mediana": 7621.91,
-        "preco_total_medio": 879210.95,
-        "amostras": 508
+        "preco_m2_medio": 7522.33,
+        "preco_m2_mediana": 7327.89,
+        "preco_total_medio": 802832.33,
+        "amostras": 339
       },
       {
         "ano": 2014,
-        "preco_m2_medio": 8383.46,
-        "preco_m2_mediana": 8000.76,
-        "preco_total_medio": 920120.04,
-        "amostras": 514
+        "preco_m2_medio": 7964.09,
+        "preco_m2_mediana": 7635.56,
+        "preco_total_medio": 896362.97,
+        "amostras": 335
       },
       {
         "ano": 2015,
-        "preco_m2_medio": 8776.3,
-        "preco_m2_mediana": 8321.91,
-        "preco_total_medio": 1019680.02,
-        "amostras": 559
+        "preco_m2_medio": 8278.56,
+        "preco_m2_mediana": 7877.31,
+        "preco_total_medio": 922005.18,
+        "amostras": 380
       },
       {
         "ano": 2016,
-        "preco_m2_medio": 9155.29,
-        "preco_m2_mediana": 8567.92,
-        "preco_total_medio": 979010.0,
-        "amostras": 550
+        "preco_m2_medio": 8872.2,
+        "preco_m2_mediana": 8556.08,
+        "preco_total_medio": 936585.67,
+        "amostras": 376
       },
       {
         "ano": 2017,
-        "preco_m2_medio": 9454.69,
-        "preco_m2_mediana": 8998.28,
-        "preco_total_medio": 1030744.38,
-        "amostras": 490
+        "preco_m2_medio": 9063.49,
+        "preco_m2_mediana": 8551.79,
+        "preco_total_medio": 982788.22,
+        "amostras": 329
       },
       {
         "ano": 2018,
-        "preco_m2_medio": 9799.63,
-        "preco_m2_mediana": 9286.69,
-        "preco_total_medio": 1093726.2,
-        "amostras": 583
+        "preco_m2_medio": 9501.99,
+        "preco_m2_mediana": 8931.74,
+        "preco_total_medio": 1079013.61,
+        "amostras": 385
       },
       {
         "ano": 2019,
-        "preco_m2_medio": 10127.8,
-        "preco_m2_mediana": 9754.43,
-        "preco_total_medio": 1120908.42,
-        "amostras": 516
+        "preco_m2_medio": 9811.67,
+        "preco_m2_mediana": 9387.25,
+        "preco_total_medio": 1103420.53,
+        "amostras": 364
       },
       {
         "ano": 2020,
-        "preco_m2_medio": 10396.57,
-        "preco_m2_mediana": 10049.02,
-        "preco_total_medio": 1092645.61,
-        "amostras": 552
+        "preco_m2_medio": 10026.82,
+        "preco_m2_mediana": 9746.91,
+        "preco_total_medio": 1095236.43,
+        "amostras": 367
       },
       {
         "ano": 2021,
-        "preco_m2_medio": 10752.06,
-        "preco_m2_mediana": 10375.48,
-        "preco_total_medio": 1153248.08,
-        "amostras": 559
+        "preco_m2_medio": 10688.03,
+        "preco_m2_mediana": 10263.18,
+        "preco_total_medio": 1184998.0,
+        "amostras": 385
       },
       {
         "ano": 2022,
-        "preco_m2_medio": 11157.71,
-        "preco_m2_mediana": 10640.24,
-        "preco_total_medio": 1221923.7,
-        "amostras": 546
+        "preco_m2_medio": 10927.64,
+        "preco_m2_mediana": 10474.9,
+        "preco_total_medio": 1172631.25,
+        "amostras": 370
       },
       {
         "ano": 2023,
-        "preco_m2_medio": 11499.48,
-        "preco_m2_mediana": 10766.48,
-        "preco_total_medio": 1290670.78,
-        "amostras": 496
+        "preco_m2_medio": 11308.71,
+        "preco_m2_mediana": 10499.96,
+        "preco_total_medio": 1271673.11,
+        "amostras": 309
       },
       {
         "ano": 2024,
-        "preco_m2_medio": 11756.27,
-        "preco_m2_mediana": 11275.61,
-        "preco_total_medio": 1225720.23,
-        "amostras": 580
+        "preco_m2_medio": 11662.27,
+        "preco_m2_mediana": 11085.31,
+        "preco_total_medio": 1208297.11,
+        "amostras": 376
       },
       {
         "ano": 2025,
-        "preco_m2_medio": 12007.78,
-        "preco_m2_mediana": 11445.2,
-        "preco_total_medio": 1395125.82,
-        "amostras": 522
+        "preco_m2_medio": 11935.09,
+        "preco_m2_mediana": 11410.28,
+        "preco_total_medio": 1388023.44,
+        "amostras": 340
       },
       {
         "ano": 2026,
-        "preco_m2_medio": 12556.49,
-        "preco_m2_mediana": 12007.42,
-        "preco_total_medio": 1381044.24,
-        "amostras": 525
+        "preco_m2_medio": 12500.81,
+        "preco_m2_mediana": 11977.18,
+        "preco_total_medio": 1391466.68,
+        "amostras": 345
       }
     ],
     "SC": [
       {
         "ano": 2013,
-        "preco_m2_medio": 7908.88,
-        "preco_m2_mediana": 7652.98,
-        "preco_total_medio": 930302.88,
-        "amostras": 335
+        "preco_m2_medio": 7274.03,
+        "preco_m2_mediana": 6925.56,
+        "preco_total_medio": 826384.47,
+        "amostras": 252
       },
       {
         "ano": 2014,
-        "preco_m2_medio": 8177.14,
-        "preco_m2_mediana": 7635.56,
-        "preco_total_medio": 913629.57,
-        "amostras": 359
+        "preco_m2_medio": 7657.06,
+        "preco_m2_mediana": 7281.84,
+        "preco_total_medio": 855477.8,
+        "amostras": 259
       },
       {
         "ano": 2015,
-        "preco_m2_medio": 8694.21,
-        "preco_m2_mediana": 8271.73,
-        "preco_total_medio": 1086539.33,
-        "amostras": 363
+        "preco_m2_medio": 8193.94,
+        "preco_m2_mediana": 7639.27,
+        "preco_total_medio": 997826.82,
+        "amostras": 273
       },
       {
         "ano": 2016,
-        "preco_m2_medio": 9380.34,
-        "preco_m2_mediana": 8794.79,
-        "preco_total_medio": 1086458.92,
-        "amostras": 336
+        "preco_m2_medio": 8825.44,
+        "preco_m2_mediana": 8185.89,
+        "preco_total_medio": 1027504.78,
+        "amostras": 231
       },
       {
         "ano": 2017,
-        "preco_m2_medio": 10145.21,
-        "preco_m2_mediana": 9583.76,
-        "preco_total_medio": 1161249.04,
-        "amostras": 350
+        "preco_m2_medio": 9391.66,
+        "preco_m2_mediana": 8923.1,
+        "preco_total_medio": 1017211.61,
+        "amostras": 218
       },
       {
         "ano": 2018,
-        "preco_m2_medio": 10165.58,
-        "preco_m2_mediana": 9513.42,
-        "preco_total_medio": 1137453.11,
-        "amostras": 352
+        "preco_m2_medio": 9718.56,
+        "preco_m2_mediana": 9019.13,
+        "preco_total_medio": 1116824.91,
+        "amostras": 231
       },
       {
         "ano": 2019,
-        "preco_m2_medio": 10734.24,
-        "preco_m2_mediana": 10424.4,
-        "preco_total_medio": 1133805.52,
-        "amostras": 386
+        "preco_m2_medio": 10307.89,
+        "preco_m2_mediana": 9968.62,
+        "preco_total_medio": 1108445.05,
+        "amostras": 276
       },
       {
         "ano": 2020,
-        "preco_m2_medio": 10737.18,
-        "preco_m2_mediana": 10366.32,
-        "preco_total_medio": 1211847.04,
-        "amostras": 344
+        "preco_m2_medio": 10419.47,
+        "preco_m2_mediana": 9674.08,
+        "preco_total_medio": 1139292.84,
+        "amostras": 236
       },
       {
         "ano": 2021,
-        "preco_m2_medio": 11937.38,
-        "preco_m2_mediana": 11264.83,
-        "preco_total_medio": 1442279.89,
-        "amostras": 376
+        "preco_m2_medio": 11810.54,
+        "preco_m2_mediana": 11136.65,
+        "preco_total_medio": 1501777.71,
+        "amostras": 268
       },
       {
         "ano": 2022,
-        "preco_m2_medio": 12153.69,
-        "preco_m2_mediana": 11793.15,
-        "preco_total_medio": 1516584.62,
-        "amostras": 365
+        "preco_m2_medio": 11540.84,
+        "preco_m2_mediana": 10670.24,
+        "preco_total_medio": 1324904.01,
+        "amostras": 241
       },
       {
         "ano": 2023,
-        "preco_m2_medio": 12593.45,
-        "preco_m2_mediana": 11894.08,
-        "preco_total_medio": 1420609.26,
-        "amostras": 364
+        "preco_m2_medio": 12520.52,
+        "preco_m2_mediana": 12064.76,
+        "preco_total_medio": 1352258.72,
+        "amostras": 274
       },
       {
         "ano": 2024,
-        "preco_m2_medio": 13046.8,
-        "preco_m2_mediana": 12671.76,
-        "preco_total_medio": 1358965.65,
-        "amostras": 390
+        "preco_m2_medio": 12761.89,
+        "preco_m2_mediana": 12593.12,
+        "preco_total_medio": 1354700.0,
+        "amostras": 259
       },
       {
         "ano": 2025,
-        "preco_m2_medio": 13657.42,
-        "preco_m2_mediana": 13152.62,
-        "preco_total_medio": 1642138.8,
-        "amostras": 344
+        "preco_m2_medio": 13877.45,
+        "preco_m2_mediana": 13368.83,
+        "preco_total_medio": 1657217.18,
+        "amostras": 242
       },
       {
         "ano": 2026,
-        "preco_m2_medio": 13331.03,
-        "preco_m2_mediana": 12950.94,
-        "preco_total_medio": 1524699.26,
-        "amostras": 336
+        "preco_m2_medio": 13365.85,
+        "preco_m2_mediana": 12908.74,
+        "preco_total_medio": 1518869.29,
+        "amostras": 240
+      }
+    ],
+    "MG": [
+      {
+        "ano": 2013,
+        "preco_m2_medio": 6736.86,
+        "preco_m2_mediana": 6635.31,
+        "preco_total_medio": 750753.07,
+        "amostras": 170
+      },
+      {
+        "ano": 2014,
+        "preco_m2_medio": 7059.69,
+        "preco_m2_mediana": 7124.32,
+        "preco_total_medio": 760327.09,
+        "amostras": 178
+      },
+      {
+        "ano": 2015,
+        "preco_m2_medio": 7436.39,
+        "preco_m2_mediana": 7434.62,
+        "preco_total_medio": 891241.07,
+        "amostras": 180
+      },
+      {
+        "ano": 2016,
+        "preco_m2_medio": 8067.17,
+        "preco_m2_mediana": 8043.91,
+        "preco_total_medio": 981898.61,
+        "amostras": 184
+      },
+      {
+        "ano": 2017,
+        "preco_m2_medio": 7982.27,
+        "preco_m2_mediana": 7975.14,
+        "preco_total_medio": 794183.27,
+        "amostras": 194
+      },
+      {
+        "ano": 2018,
+        "preco_m2_medio": 8364.71,
+        "preco_m2_mediana": 8162.3,
+        "preco_total_medio": 909832.97,
+        "amostras": 197
+      },
+      {
+        "ano": 2019,
+        "preco_m2_medio": 8948.22,
+        "preco_m2_mediana": 9006.79,
+        "preco_total_medio": 1001402.53,
+        "amostras": 159
+      },
+      {
+        "ano": 2020,
+        "preco_m2_medio": 9423.4,
+        "preco_m2_mediana": 9179.2,
+        "preco_total_medio": 1029984.94,
+        "amostras": 165
+      },
+      {
+        "ano": 2021,
+        "preco_m2_medio": 9998.14,
+        "preco_m2_mediana": 10051.83,
+        "preco_total_medio": 1046156.46,
+        "amostras": 194
+      },
+      {
+        "ano": 2022,
+        "preco_m2_medio": 10331.67,
+        "preco_m2_mediana": 10323.09,
+        "preco_total_medio": 1181552.88,
+        "amostras": 192
+      },
+      {
+        "ano": 2023,
+        "preco_m2_medio": 10411.96,
+        "preco_m2_mediana": 10208.95,
+        "preco_total_medio": 1083383.35,
+        "amostras": 156
+      },
+      {
+        "ano": 2024,
+        "preco_m2_medio": 10939.96,
+        "preco_m2_mediana": 11087.4,
+        "preco_total_medio": 1187222.08,
+        "amostras": 180
+      },
+      {
+        "ano": 2025,
+        "preco_m2_medio": 11088.81,
+        "preco_m2_mediana": 10588.72,
+        "preco_total_medio": 1273885.63,
+        "amostras": 178
+      },
+      {
+        "ano": 2026,
+        "preco_m2_medio": 11273.24,
+        "preco_m2_mediana": 10471.04,
+        "preco_total_medio": 1213786.88,
+        "amostras": 173
+      }
+    ],
+    "RJ": [
+      {
+        "ano": 2013,
+        "preco_m2_medio": 9203.76,
+        "preco_m2_mediana": 8127.07,
+        "preco_total_medio": 1041174.75,
+        "amostras": 224
+      },
+      {
+        "ano": 2014,
+        "preco_m2_medio": 10164.04,
+        "preco_m2_mediana": 9330.94,
+        "preco_total_medio": 1070671.32,
+        "amostras": 206
+      },
+      {
+        "ano": 2015,
+        "preco_m2_medio": 10621.48,
+        "preco_m2_mediana": 9343.28,
+        "preco_total_medio": 1247163.22,
+        "amostras": 205
+      },
+      {
+        "ano": 2016,
+        "preco_m2_medio": 10968.16,
+        "preco_m2_mediana": 9716.27,
+        "preco_total_medio": 1245269.85,
+        "amostras": 216
+      },
+      {
+        "ano": 2017,
+        "preco_m2_medio": 11452.66,
+        "preco_m2_mediana": 10660.4,
+        "preco_total_medio": 1257934.44,
+        "amostras": 218
+      },
+      {
+        "ano": 2018,
+        "preco_m2_medio": 12176.58,
+        "preco_m2_mediana": 10911.32,
+        "preco_total_medio": 1270126.55,
+        "amostras": 207
+      },
+      {
+        "ano": 2019,
+        "preco_m2_medio": 13227.95,
+        "preco_m2_mediana": 11705.67,
+        "preco_total_medio": 1437300.15,
+        "amostras": 211
+      },
+      {
+        "ano": 2020,
+        "preco_m2_medio": 12969.27,
+        "preco_m2_mediana": 11861.11,
+        "preco_total_medio": 1576721.43,
+        "amostras": 202
+      },
+      {
+        "ano": 2021,
+        "preco_m2_medio": 13170.92,
+        "preco_m2_mediana": 11639.42,
+        "preco_total_medio": 1479352.39,
+        "amostras": 234
+      },
+      {
+        "ano": 2022,
+        "preco_m2_medio": 12661.08,
+        "preco_m2_mediana": 11739.21,
+        "preco_total_medio": 1361338.47,
+        "amostras": 208
+      },
+      {
+        "ano": 2023,
+        "preco_m2_medio": 14311.12,
+        "preco_m2_mediana": 13474.95,
+        "preco_total_medio": 1525773.44,
+        "amostras": 197
+      },
+      {
+        "ano": 2024,
+        "preco_m2_medio": 15065.88,
+        "preco_m2_mediana": 13492.16,
+        "preco_total_medio": 1601761.81,
+        "amostras": 232
+      },
+      {
+        "ano": 2025,
+        "preco_m2_medio": 15970.65,
+        "preco_m2_mediana": 14504.36,
+        "preco_total_medio": 1943581.82,
+        "amostras": 197
+      },
+      {
+        "ano": 2026,
+        "preco_m2_medio": 15808.24,
+        "preco_m2_mediana": 14290.61,
+        "preco_total_medio": 1719678.8,
+        "amostras": 243
+      }
+    ],
+    "DF": [
+      {
+        "ano": 2013,
+        "preco_m2_medio": 7610.63,
+        "preco_m2_mediana": 7463.38,
+        "preco_total_medio": 892093.89,
+        "amostras": 143
+      },
+      {
+        "ano": 2014,
+        "preco_m2_medio": 8432.88,
+        "preco_m2_mediana": 8404.77,
+        "preco_total_medio": 929602.36,
+        "amostras": 146
+      },
+      {
+        "ano": 2015,
+        "preco_m2_medio": 8431.43,
+        "preco_m2_mediana": 8279.65,
+        "preco_total_medio": 928724.47,
+        "amostras": 140
+      },
+      {
+        "ano": 2016,
+        "preco_m2_medio": 8875.72,
+        "preco_m2_mediana": 8752.84,
+        "preco_total_medio": 1047083.81,
+        "amostras": 141
+      },
+      {
+        "ano": 2017,
+        "preco_m2_medio": 9549.46,
+        "preco_m2_mediana": 9275.13,
+        "preco_total_medio": 1098916.04,
+        "amostras": 129
+      },
+      {
+        "ano": 2018,
+        "preco_m2_medio": 10036.9,
+        "preco_m2_mediana": 9803.97,
+        "preco_total_medio": 1152932.82,
+        "amostras": 155
+      },
+      {
+        "ano": 2019,
+        "preco_m2_medio": 10072.25,
+        "preco_m2_mediana": 10157.15,
+        "preco_total_medio": 1100065.51,
+        "amostras": 145
+      },
+      {
+        "ano": 2020,
+        "preco_m2_medio": 10864.22,
+        "preco_m2_mediana": 10834.06,
+        "preco_total_medio": 1189403.44,
+        "amostras": 146
+      },
+      {
+        "ano": 2021,
+        "preco_m2_medio": 10616.93,
+        "preco_m2_mediana": 10781.84,
+        "preco_total_medio": 1021781.11,
+        "amostras": 139
+      },
+      {
+        "ano": 2022,
+        "preco_m2_medio": 11563.01,
+        "preco_m2_mediana": 11296.42,
+        "preco_total_medio": 1274994.28,
+        "amostras": 139
+      },
+      {
+        "ano": 2023,
+        "preco_m2_medio": 12089.65,
+        "preco_m2_mediana": 12277.71,
+        "preco_total_medio": 1358811.11,
+        "amostras": 147
+      },
+      {
+        "ano": 2024,
+        "preco_m2_medio": 12825.41,
+        "preco_m2_mediana": 12838.08,
+        "preco_total_medio": 1579853.53,
+        "amostras": 146
+      },
+      {
+        "ano": 2025,
+        "preco_m2_medio": 12364.73,
+        "preco_m2_mediana": 12170.48,
+        "preco_total_medio": 1375224.62,
+        "amostras": 127
+      },
+      {
+        "ano": 2026,
+        "preco_m2_medio": 12958.34,
+        "preco_m2_mediana": 12697.03,
+        "preco_total_medio": 1528742.49,
+        "amostras": 157
+      }
+    ],
+    "PR": [
+      {
+        "ano": 2013,
+        "preco_m2_medio": 7034.01,
+        "preco_m2_mediana": 6731.27,
+        "preco_total_medio": 800323.53,
+        "amostras": 141
+      },
+      {
+        "ano": 2014,
+        "preco_m2_medio": 7283.4,
+        "preco_m2_mediana": 7030.64,
+        "preco_total_medio": 810232.39,
+        "amostras": 149
+      },
+      {
+        "ano": 2015,
+        "preco_m2_medio": 7992.51,
+        "preco_m2_mediana": 7758.06,
+        "preco_total_medio": 893335.13,
+        "amostras": 123
+      },
+      {
+        "ano": 2016,
+        "preco_m2_medio": 8032.05,
+        "preco_m2_mediana": 7777.47,
+        "preco_total_medio": 848710.79,
+        "amostras": 132
+      },
+      {
+        "ano": 2017,
+        "preco_m2_medio": 8561.63,
+        "preco_m2_mediana": 8215.28,
+        "preco_total_medio": 986601.15,
+        "amostras": 147
+      },
+      {
+        "ano": 2018,
+        "preco_m2_medio": 9154.27,
+        "preco_m2_mediana": 8644.98,
+        "preco_total_medio": 950921.37,
+        "amostras": 154
+      },
+      {
+        "ano": 2019,
+        "preco_m2_medio": 9447.81,
+        "preco_m2_mediana": 9284.52,
+        "preco_total_medio": 1004898.66,
+        "amostras": 116
+      },
+      {
+        "ano": 2020,
+        "preco_m2_medio": 9692.9,
+        "preco_m2_mediana": 9351.34,
+        "preco_total_medio": 1055439.13,
+        "amostras": 124
+      },
+      {
+        "ano": 2021,
+        "preco_m2_medio": 10266.67,
+        "preco_m2_mediana": 9616.42,
+        "preco_total_medio": 1183742.18,
+        "amostras": 150
+      },
+      {
+        "ano": 2022,
+        "preco_m2_medio": 11008.7,
+        "preco_m2_mediana": 10451.58,
+        "preco_total_medio": 1200458.3,
+        "amostras": 144
+      },
+      {
+        "ano": 2023,
+        "preco_m2_medio": 11026.01,
+        "preco_m2_mediana": 10490.54,
+        "preco_total_medio": 1163954.36,
+        "amostras": 163
+      },
+      {
+        "ano": 2024,
+        "preco_m2_medio": 11555.56,
+        "preco_m2_mediana": 11117.82,
+        "preco_total_medio": 1253257.99,
+        "amostras": 154
+      },
+      {
+        "ano": 2025,
+        "preco_m2_medio": 11826.25,
+        "preco_m2_mediana": 11423.2,
+        "preco_total_medio": 1300338.7,
+        "amostras": 145
+      },
+      {
+        "ano": 2026,
+        "preco_m2_medio": 12097.33,
+        "preco_m2_mediana": 12123.19,
+        "preco_total_medio": 1205835.22,
+        "amostras": 158
       }
     ]
   },
@@ -320,77 +728,499 @@
     "SP": [
       {
         "ano": 2027,
-        "preco_m2_estimado": 12794.91,
-        "preco_m2_min": 12730.25,
-        "preco_m2_max": 12859.57,
-        "preco_total_estimado": 1407265.77,
-        "preco_total_min": 1362076.82,
-        "preco_total_max": 1452454.71
+        "preco_m2_estimado": 12790.33,
+        "preco_m2_min": 12684.09,
+        "preco_m2_max": 12896.57,
+        "preco_total_estimado": 1419695.36,
+        "preco_total_min": 1376091.58,
+        "preco_total_max": 1463299.14
       },
       {
         "ano": 2028,
-        "preco_m2_estimado": 13130.07,
-        "preco_m2_min": 13052.48,
-        "preco_m2_max": 13207.67,
-        "preco_total_estimado": 1444389.02,
-        "preco_total_min": 1390162.29,
-        "preco_total_max": 1498615.76
+        "preco_m2_estimado": 13161.77,
+        "preco_m2_min": 13034.28,
+        "preco_m2_max": 13289.26,
+        "preco_total_estimado": 1461984.88,
+        "preco_total_min": 1409660.35,
+        "preco_total_max": 1514309.42
       },
       {
         "ano": 2029,
-        "preco_m2_estimado": 13465.23,
-        "preco_m2_min": 13374.7,
-        "preco_m2_max": 13555.76,
-        "preco_total_estimado": 1481512.28,
-        "preco_total_min": 1418247.77,
-        "preco_total_max": 1544776.8
+        "preco_m2_estimado": 13533.2,
+        "preco_m2_min": 13384.47,
+        "preco_m2_max": 13681.94,
+        "preco_total_estimado": 1504274.41,
+        "preco_total_min": 1443229.12,
+        "preco_total_max": 1565319.7
       },
       {
         "ano": 2030,
-        "preco_m2_estimado": 13800.39,
-        "preco_m2_min": 13696.93,
-        "preco_m2_max": 13903.85,
-        "preco_total_estimado": 1518635.54,
-        "preco_total_min": 1446333.24,
-        "preco_total_max": 1590937.85
+        "preco_m2_estimado": 13904.64,
+        "preco_m2_min": 13734.66,
+        "preco_m2_max": 14074.63,
+        "preco_total_estimado": 1546563.94,
+        "preco_total_min": 1476797.89,
+        "preco_total_max": 1616329.99
+      },
+      {
+        "ano": 2031,
+        "preco_m2_estimado": 14276.08,
+        "preco_m2_min": 14084.85,
+        "preco_m2_max": 14467.31,
+        "preco_total_estimado": 1588853.47,
+        "preco_total_min": 1510366.66,
+        "preco_total_max": 1667340.27
+      },
+      {
+        "ano": 2032,
+        "preco_m2_estimado": 14647.52,
+        "preco_m2_min": 14435.03,
+        "preco_m2_max": 14860.0,
+        "preco_total_estimado": 1631143.0,
+        "preco_total_min": 1543935.44,
+        "preco_total_max": 1718350.56
+      },
+      {
+        "ano": 2033,
+        "preco_m2_estimado": 15018.95,
+        "preco_m2_min": 14785.22,
+        "preco_m2_max": 15252.69,
+        "preco_total_estimado": 1673432.52,
+        "preco_total_min": 1577504.21,
+        "preco_total_max": 1769360.84
+      },
+      {
+        "ano": 2034,
+        "preco_m2_estimado": 15390.39,
+        "preco_m2_min": 15135.41,
+        "preco_m2_max": 15645.37,
+        "preco_total_estimado": 1715722.05,
+        "preco_total_min": 1611072.98,
+        "preco_total_max": 1820371.12
+      },
+      {
+        "ano": 2035,
+        "preco_m2_estimado": 15761.83,
+        "preco_m2_min": 15485.6,
+        "preco_m2_max": 16038.06,
+        "preco_total_estimado": 1758011.58,
+        "preco_total_min": 1644641.75,
+        "preco_total_max": 1871381.41
       }
     ],
     "SC": [
       {
         "ano": 2027,
-        "preco_m2_estimado": 14329.69,
-        "preco_m2_min": 14015.22,
-        "preco_m2_max": 14644.17,
-        "preco_total_estimado": 1638834.33,
-        "preco_total_min": 1541076.48,
-        "preco_total_max": 1736592.18
+        "preco_m2_estimado": 14367.21,
+        "preco_m2_min": 14021.16,
+        "preco_m2_max": 14713.27,
+        "preco_total_estimado": 1628984.93,
+        "preco_total_min": 1522705.55,
+        "preco_total_max": 1735264.32
       },
       {
         "ano": 2028,
-        "preco_m2_estimado": 14786.39,
-        "preco_m2_min": 14409.02,
-        "preco_m2_max": 15163.76,
-        "preco_total_estimado": 1690044.97,
-        "preco_total_min": 1572735.55,
-        "preco_total_max": 1807354.4
+        "preco_m2_estimado": 14876.5,
+        "preco_m2_min": 14461.24,
+        "preco_m2_max": 15291.77,
+        "preco_total_estimado": 1686195.35,
+        "preco_total_min": 1558660.09,
+        "preco_total_max": 1813730.61
       },
       {
         "ano": 2029,
-        "preco_m2_estimado": 15243.08,
-        "preco_m2_min": 14802.82,
-        "preco_m2_max": 15683.35,
-        "preco_total_estimado": 1741255.62,
-        "preco_total_min": 1604394.62,
-        "preco_total_max": 1878116.61
+        "preco_m2_estimado": 15385.8,
+        "preco_m2_min": 14901.32,
+        "preco_m2_max": 15870.28,
+        "preco_total_estimado": 1743405.77,
+        "preco_total_min": 1594614.63,
+        "preco_total_max": 1892196.91
       },
       {
         "ano": 2030,
-        "preco_m2_estimado": 15699.78,
-        "preco_m2_min": 15196.62,
-        "preco_m2_max": 16202.94,
-        "preco_total_estimado": 1792466.26,
-        "preco_total_min": 1636053.7,
-        "preco_total_max": 1948878.83
+        "preco_m2_estimado": 15895.09,
+        "preco_m2_min": 15341.4,
+        "preco_m2_max": 16448.78,
+        "preco_total_estimado": 1800616.19,
+        "preco_total_min": 1630569.17,
+        "preco_total_max": 1970663.2
+      },
+      {
+        "ano": 2031,
+        "preco_m2_estimado": 16404.39,
+        "preco_m2_min": 15781.49,
+        "preco_m2_max": 17027.29,
+        "preco_total_estimado": 1857826.6,
+        "preco_total_min": 1666523.71,
+        "preco_total_max": 2049129.5
+      },
+      {
+        "ano": 2032,
+        "preco_m2_estimado": 16913.68,
+        "preco_m2_min": 16221.57,
+        "preco_m2_max": 17605.79,
+        "preco_total_estimado": 1915037.02,
+        "preco_total_min": 1702478.25,
+        "preco_total_max": 2127595.79
+      },
+      {
+        "ano": 2033,
+        "preco_m2_estimado": 17422.97,
+        "preco_m2_min": 16661.65,
+        "preco_m2_max": 18184.3,
+        "preco_total_estimado": 1972247.44,
+        "preco_total_min": 1738432.79,
+        "preco_total_max": 2206062.09
+      },
+      {
+        "ano": 2034,
+        "preco_m2_estimado": 17932.27,
+        "preco_m2_min": 17101.73,
+        "preco_m2_max": 18762.8,
+        "preco_total_estimado": 2029457.86,
+        "preco_total_min": 1774387.34,
+        "preco_total_max": 2284528.38
+      },
+      {
+        "ano": 2035,
+        "preco_m2_estimado": 18441.56,
+        "preco_m2_min": 17541.82,
+        "preco_m2_max": 19341.3,
+        "preco_total_estimado": 2086668.28,
+        "preco_total_min": 1810341.88,
+        "preco_total_max": 2362994.68
+      }
+    ],
+    "MG": [
+      {
+        "ano": 2027,
+        "preco_m2_estimado": 11922.51,
+        "preco_m2_min": 11704.05,
+        "preco_m2_max": 12140.97,
+        "preco_total_estimado": 1294640.44,
+        "preco_total_min": 1222390.58,
+        "preco_total_max": 1366890.31
+      },
+      {
+        "ano": 2028,
+        "preco_m2_estimado": 12292.53,
+        "preco_m2_min": 12030.38,
+        "preco_m2_max": 12554.69,
+        "preco_total_estimado": 1332920.02,
+        "preco_total_min": 1246220.18,
+        "preco_total_max": 1419619.86
+      },
+      {
+        "ano": 2029,
+        "preco_m2_estimado": 12662.56,
+        "preco_m2_min": 12356.71,
+        "preco_m2_max": 12968.4,
+        "preco_total_estimado": 1371199.59,
+        "preco_total_min": 1270049.79,
+        "preco_total_max": 1472349.4
+      },
+      {
+        "ano": 2030,
+        "preco_m2_estimado": 13032.58,
+        "preco_m2_min": 12683.05,
+        "preco_m2_max": 13382.12,
+        "preco_total_estimado": 1409479.17,
+        "preco_total_min": 1293879.39,
+        "preco_total_max": 1525078.95
+      },
+      {
+        "ano": 2031,
+        "preco_m2_estimado": 13402.61,
+        "preco_m2_min": 13009.38,
+        "preco_m2_max": 13795.84,
+        "preco_total_estimado": 1447758.74,
+        "preco_total_min": 1317708.99,
+        "preco_total_max": 1577808.5
+      },
+      {
+        "ano": 2032,
+        "preco_m2_estimado": 13772.63,
+        "preco_m2_min": 13335.71,
+        "preco_m2_max": 14209.55,
+        "preco_total_estimado": 1486038.32,
+        "preco_total_min": 1341538.59,
+        "preco_total_max": 1630538.05
+      },
+      {
+        "ano": 2033,
+        "preco_m2_estimado": 14142.66,
+        "preco_m2_min": 13662.05,
+        "preco_m2_max": 14623.27,
+        "preco_total_estimado": 1524317.89,
+        "preco_total_min": 1365368.2,
+        "preco_total_max": 1683267.59
+      },
+      {
+        "ano": 2034,
+        "preco_m2_estimado": 14512.68,
+        "preco_m2_min": 13988.38,
+        "preco_m2_max": 15036.99,
+        "preco_total_estimado": 1562597.47,
+        "preco_total_min": 1389197.8,
+        "preco_total_max": 1735997.14
+      },
+      {
+        "ano": 2035,
+        "preco_m2_estimado": 14882.71,
+        "preco_m2_min": 14314.71,
+        "preco_m2_max": 15450.7,
+        "preco_total_estimado": 1600877.05,
+        "preco_total_min": 1413027.4,
+        "preco_total_max": 1788726.69
+      }
+    ],
+    "RJ": [
+      {
+        "ano": 2027,
+        "preco_m2_estimado": 16355.64,
+        "preco_m2_min": 15794.47,
+        "preco_m2_max": 16916.81,
+        "preco_total_estimado": 1822510.05,
+        "preco_total_min": 1699903.56,
+        "preco_total_max": 1945116.54
+      },
+      {
+        "ano": 2028,
+        "preco_m2_estimado": 16843.33,
+        "preco_m2_min": 16169.92,
+        "preco_m2_max": 17516.73,
+        "preco_total_estimado": 1877150.92,
+        "preco_total_min": 1730023.14,
+        "preco_total_max": 2024278.71
+      },
+      {
+        "ano": 2029,
+        "preco_m2_estimado": 17331.01,
+        "preco_m2_min": 16545.37,
+        "preco_m2_max": 18116.66,
+        "preco_total_estimado": 1931791.8,
+        "preco_total_min": 1760142.72,
+        "preco_total_max": 2103440.89
+      },
+      {
+        "ano": 2030,
+        "preco_m2_estimado": 17818.7,
+        "preco_m2_min": 16920.82,
+        "preco_m2_max": 18716.58,
+        "preco_total_estimado": 1986432.68,
+        "preco_total_min": 1790262.3,
+        "preco_total_max": 2182603.07
+      },
+      {
+        "ano": 2031,
+        "preco_m2_estimado": 18306.39,
+        "preco_m2_min": 17296.28,
+        "preco_m2_max": 19316.5,
+        "preco_total_estimado": 2041073.56,
+        "preco_total_min": 1820381.88,
+        "preco_total_max": 2261765.24
+      },
+      {
+        "ano": 2032,
+        "preco_m2_estimado": 18794.08,
+        "preco_m2_min": 17671.73,
+        "preco_m2_max": 19916.42,
+        "preco_total_estimado": 2095714.44,
+        "preco_total_min": 1850501.46,
+        "preco_total_max": 2340927.42
+      },
+      {
+        "ano": 2033,
+        "preco_m2_estimado": 19281.76,
+        "preco_m2_min": 18047.18,
+        "preco_m2_max": 20516.35,
+        "preco_total_estimado": 2150355.32,
+        "preco_total_min": 1880621.04,
+        "preco_total_max": 2420089.6
+      },
+      {
+        "ano": 2034,
+        "preco_m2_estimado": 19769.45,
+        "preco_m2_min": 18422.63,
+        "preco_m2_max": 21116.27,
+        "preco_total_estimado": 2204996.19,
+        "preco_total_min": 1910740.62,
+        "preco_total_max": 2499251.77
+      },
+      {
+        "ano": 2035,
+        "preco_m2_estimado": 20257.14,
+        "preco_m2_min": 18798.09,
+        "preco_m2_max": 21716.19,
+        "preco_total_estimado": 2259637.07,
+        "preco_total_min": 1940860.2,
+        "preco_total_max": 2578413.95
+      }
+    ],
+    "DF": [
+      {
+        "ano": 2027,
+        "preco_m2_estimado": 13538.63,
+        "preco_m2_min": 13215.14,
+        "preco_m2_max": 13862.12,
+        "preco_total_estimado": 1536304.36,
+        "preco_total_min": 1428767.86,
+        "preco_total_max": 1643840.86
+      },
+      {
+        "ano": 2028,
+        "preco_m2_estimado": 13950.53,
+        "preco_m2_min": 13562.35,
+        "preco_m2_max": 14338.72,
+        "preco_total_estimado": 1584209.42,
+        "preco_total_min": 1455165.62,
+        "preco_total_max": 1713253.22
+      },
+      {
+        "ano": 2029,
+        "preco_m2_estimado": 14362.43,
+        "preco_m2_min": 13909.55,
+        "preco_m2_max": 14815.32,
+        "preco_total_estimado": 1632114.48,
+        "preco_total_min": 1481563.38,
+        "preco_total_max": 1782665.58
+      },
+      {
+        "ano": 2030,
+        "preco_m2_estimado": 14774.33,
+        "preco_m2_min": 14256.75,
+        "preco_m2_max": 15291.91,
+        "preco_total_estimado": 1680019.55,
+        "preco_total_min": 1507961.14,
+        "preco_total_max": 1852077.95
+      },
+      {
+        "ano": 2031,
+        "preco_m2_estimado": 15186.23,
+        "preco_m2_min": 14603.95,
+        "preco_m2_max": 15768.51,
+        "preco_total_estimado": 1727924.61,
+        "preco_total_min": 1534358.91,
+        "preco_total_max": 1921490.31
+      },
+      {
+        "ano": 2032,
+        "preco_m2_estimado": 15598.13,
+        "preco_m2_min": 14951.15,
+        "preco_m2_max": 16245.11,
+        "preco_total_estimado": 1775829.67,
+        "preco_total_min": 1560756.67,
+        "preco_total_max": 1990902.67
+      },
+      {
+        "ano": 2033,
+        "preco_m2_estimado": 16010.02,
+        "preco_m2_min": 15298.35,
+        "preco_m2_max": 16721.7,
+        "preco_total_estimado": 1823734.73,
+        "preco_total_min": 1587154.43,
+        "preco_total_max": 2060315.04
+      },
+      {
+        "ano": 2034,
+        "preco_m2_estimado": 16421.92,
+        "preco_m2_min": 15645.55,
+        "preco_m2_max": 17198.3,
+        "preco_total_estimado": 1871639.8,
+        "preco_total_min": 1613552.19,
+        "preco_total_max": 2129727.4
+      },
+      {
+        "ano": 2035,
+        "preco_m2_estimado": 16833.82,
+        "preco_m2_min": 15992.75,
+        "preco_m2_max": 17674.89,
+        "preco_total_estimado": 1919544.86,
+        "preco_total_min": 1639949.95,
+        "preco_total_max": 2199139.76
+      }
+    ],
+    "PR": [
+      {
+        "ano": 2027,
+        "preco_m2_estimado": 12684.83,
+        "preco_m2_min": 12503.37,
+        "preco_m2_max": 12866.3,
+        "preco_total_estimado": 1342505.48,
+        "preco_total_min": 1285346.58,
+        "preco_total_max": 1399664.38
+      },
+      {
+        "ano": 2028,
+        "preco_m2_estimado": 13090.63,
+        "preco_m2_min": 12872.88,
+        "preco_m2_max": 13308.38,
+        "preco_total_estimado": 1381905.75,
+        "preco_total_min": 1313315.07,
+        "preco_total_max": 1450496.43
+      },
+      {
+        "ano": 2029,
+        "preco_m2_estimado": 13496.43,
+        "preco_m2_min": 13242.38,
+        "preco_m2_max": 13750.47,
+        "preco_total_estimado": 1421306.01,
+        "preco_total_min": 1341283.56,
+        "preco_total_max": 1501328.47
+      },
+      {
+        "ano": 2030,
+        "preco_m2_estimado": 13902.22,
+        "preco_m2_min": 13611.88,
+        "preco_m2_max": 14192.56,
+        "preco_total_estimado": 1460706.28,
+        "preco_total_min": 1369252.04,
+        "preco_total_max": 1552160.52
+      },
+      {
+        "ano": 2031,
+        "preco_m2_estimado": 14308.02,
+        "preco_m2_min": 13981.39,
+        "preco_m2_max": 14634.65,
+        "preco_total_estimado": 1500106.55,
+        "preco_total_min": 1397220.53,
+        "preco_total_max": 1602992.56
+      },
+      {
+        "ano": 2032,
+        "preco_m2_estimado": 14713.81,
+        "preco_m2_min": 14350.89,
+        "preco_m2_max": 15076.74,
+        "preco_total_estimado": 1539506.81,
+        "preco_total_min": 1425189.01,
+        "preco_total_max": 1653824.61
+      },
+      {
+        "ano": 2033,
+        "preco_m2_estimado": 15119.61,
+        "preco_m2_min": 14720.4,
+        "preco_m2_max": 15518.83,
+        "preco_total_estimado": 1578907.08,
+        "preco_total_min": 1453157.5,
+        "preco_total_max": 1704656.65
+      },
+      {
+        "ano": 2034,
+        "preco_m2_estimado": 15525.41,
+        "preco_m2_min": 15089.9,
+        "preco_m2_max": 15960.91,
+        "preco_total_estimado": 1618307.34,
+        "preco_total_min": 1481125.98,
+        "preco_total_max": 1755488.7
+      },
+      {
+        "ano": 2035,
+        "preco_m2_estimado": 15931.2,
+        "preco_m2_min": 15459.4,
+        "preco_m2_max": 16403.0,
+        "preco_total_estimado": 1657707.61,
+        "preco_total_min": 1509094.47,
+        "preco_total_max": 1806320.74
       }
     ]
   }

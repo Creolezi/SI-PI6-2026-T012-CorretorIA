@@ -1,0 +1,74 @@
+[
+  {
+    "id": "mg_belvedere",
+    "cidade": "Belo Horizonte",
+    "nome": "Belvedere",
+    "zona": "Centro-Sul",
+    "preco_m2_base": 13800,
+    "valorizacao_anual": 0.064,
+    "descricao": "Bairro de altíssimo padrão na divisa sul de BH, próximo ao BH Shopping e condomínios nobres."
+  },
+  {
+    "id": "mg_lourdes",
+    "cidade": "Belo Horizonte",
+    "nome": "Lourdes",
+    "zona": "Centro-Sul",
+    "preco_m2_base": 13400,
+    "valorizacao_anual": 0.062,
+    "descricao": "Endereço tradicional de luxo na capital mineira, reconhecido por gastronomia e edifícios sofisticados."
+  },
+  {
+    "id": "mg_savassi",
+    "cidade": "Belo Horizonte",
+    "nome": "Savassi",
+    "zona": "Centro-Sul",
+    "preco_m2_base": 12600,
+    "valorizacao_anual": 0.060,
+    "descricao": "Polo cultural, comercial e residencial vibrante com alta liquidez de venda e locação."
+  },
+  {
+    "id": "mg_santo_agostinho",
+    "cidade": "Belo Horizonte",
+    "nome": "Santo Agostinho",
+    "zona": "Centro-Sul",
+    "preco_m2_base": 11900,
+    "valorizacao_anual": 0.056,
+    "descricao": "Bairro nobre próximo à Assembleia Legislativa e Praça da Liberdade, com forte demanda familiar."
+  },
+  {
+    "id": "mg_funcionarios",
+    "cidade": "Belo Horizonte",
+    "nome": "Funcionários",
+    "zona": "Centro-Sul",
+    "preco_m2_base": 11200,
+    "valorizacao_anual": 0.055,
+    "descricao": "Região arborizada e central com excelente oferta médica, escolar e corporativa."
+  },
+  {
+    "id": "mg_buritis",
+    "cidade": "Belo Horizonte",
+    "nome": "Buritis",
+    "zona": "Oeste",
+    "preco_m2_base": 8200,
+    "valorizacao_anual": 0.048,
+    "descricao": "Bairro jovem e residencial de grande porte com condomínios clube completos e centros universitários."
+  },
+  {
+    "id": "mg_pampulha",
+    "cidade": "Belo Horizonte",
+    "nome": "Pampulha",
+    "zona": "Pampulha",
+    "preco_m2_base": 8900,
+    "valorizacao_anual": 0.050,
+    "descricao": "Região turística ao redor da Lagoa da Pampulha com destaque para casas amplas e imóveis de lazer."
+  },
+  {
+    "id": "mg_granja_marileusa",
+    "cidade": "Uberlândia",
+    "nome": "Granja Marileusa",
+    "zona": "Zona Leste",
+    "preco_m2_base": 8400,
+    "valorizacao_anual": 0.054,
+    "descricao": "Bairro planejado referência no Triângulo Mineiro, com alta valorização impulsionada pelo setor de serviços e agronegócio."
+  }
+]

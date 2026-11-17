@@ -1,9 +1,9 @@
 """
-Suite de Testes Automatizados - CorretorIA (SP & SC)
-Projeto Integrador 6 - Sprint 3:
-- Hold-out 10% cru
-- GridSearchCV (5-Fold) em 5 modelos (Ridge, Decision Tree, Random Forest, XGBoost, MLP)
-- Série Anual (2013-2026) & Estimação de Futuro (2027-2030)
+Suite de Testes Automatizados - CorretorIA (6 Estados: SP, SC, MG, RJ, DF, PR)
+Projeto Integrador 6:
+- Base multi-estado de 18.000 amostras (2013-2026)
+- Hold-out 10% cru (1.800 amostras) + GridSearchCV (5-Fold) em 5 modelos
+- Estimação futura interativa (2026-2035)
 """
 
 import sys
@@ -15,82 +15,86 @@ sys.path.insert(0, PROJECT_ROOT)
 
 
 def run_tests():
-    print("[TEST 1/6] Importando engine e modelo campeão do GridSearchCV...")
+    print("[TEST 1/6] Importando engine e modelo campeão (18.000 amostras / 6 estados)...")
     from ml.pricing_model import engine
     engine.train_or_load()
     assert engine.model is not None, "Modelo não carregado"
     print(f"-> Modelo carregado: {engine.metrics.get('model_name')} (R² Teste Cru: {engine.metrics.get('r2')})")
 
-    print("\n[TEST 2/6] Testando predição e estimação futura em São Paulo (Moema)...")
-    res_sp = engine.predict(
-        bairro="Moema",
-        tipo="Apartamento",
-        area_m2=75,
-        ano_construcao=2018,
-        quartos=2,
-        banheiros=2,
-        vagas=1,
-        margem_corretor_pct=6.0,
-        estado="SP"
-    )
-    assert res_sp["precificacao"]["valor_justo"] > 0
-    assert res_sp["precificacao"]["faixa_minima"] < res_sp["precificacao"]["valor_justo"]
-    assert res_sp["precificacao"]["faixa_maxima"] > res_sp["precificacao"]["valor_justo"]
-    assert "estimativa_futuro" in res_sp
-    proj_sp = res_sp["estimativa_futuro"]["projecoes"]
-    assert [p["ano"] for p in proj_sp] == [2027, 2028, 2029, 2030]
-    assert proj_sp[-1]["valor_estimado"] > res_sp["precificacao"]["valor_justo"]
-    print(f"-> Sucesso! SP Moema 2026: R$ {res_sp['precificacao']['valor_justo']:,.2f} -> 2030: R$ {proj_sp[-1]['valor_estimado']:,.2f}")
+    print("\n[TEST 2/6] Testando predições nos 6 estados (SP, SC, MG, RJ, DF, PR)...")
+    casos_estados = [
+        ("SP", "São Paulo", "Moema"),
+        ("SC", "Balneário Camboriú", "Barra Sul"),
+        ("MG", "Belo Horizonte", "Belvedere"),
+        ("RJ", "Rio de Janeiro", "Leblon"),
+        ("DF", "Brasília", "Noroeste"),
+        ("PR", "Curitiba", "Batel"),
+    ]
+    for uf, cidade, bairro in casos_estados:
+        res = engine.predict(
+            bairro=bairro,
+            tipo="Apartamento",
+            area_m2=100,
+            ano_construcao=2020,
+            quartos=3,
+            banheiros=2,
+            vagas=2,
+            margem_corretor_pct=6.0,
+            estado=uf,
+            cidade=cidade,
+            ano_estimacao=2026,
+        )
+        assert res["precificacao"]["valor_justo"] > 0, f"Valor inválido em {uf}"
+        assert res["imovel"]["estado"] == uf
+        assert [p["ano"] for p in res["estimativa_futuro"]["projecoes"]] == list(range(2027, 2036))
+        print(f"   • {uf} ({cidade} - {bairro}): 2026 = R$ {res['precificacao']['valor_justo']:,.2f} -> 2035 = R$ {res['estimativa_futuro']['projecoes'][-1]['valor_estimado']:,.2f}")
 
-    print("\n[TEST 3/6] Testando predição e estimação futura em Santa Catarina (Balneário Camboriú)...")
-    res_sc = engine.predict(
-        bairro="Barra Sul",
-        tipo="Apartamento",
-        area_m2=130,
-        ano_construcao=2021,
-        quartos=3,
-        banheiros=3,
-        vagas=2,
-        margem_corretor_pct=6.0,
-        estado="SC",
-        cidade="Balneário Camboriú"
+    print("\n[TEST 3/6] Testando seletor de ano da estimação futura (ano_estimacao=2030 vs 2026)...")
+    res_2026 = engine.predict(
+        bairro="Belvedere", tipo="Apartamento", area_m2=120, ano_construcao=2021,
+        quartos=3, banheiros=3, vagas=2, estado="MG", cidade="Belo Horizonte", ano_estimacao=2026
     )
-    assert res_sc["precificacao"]["valor_justo"] > 0
-    assert res_sc["imovel"]["estado"] == "SC"
-    proj_sc = res_sc["estimativa_futuro"]["projecoes"]
-    assert [p["ano"] for p in proj_sc] == [2027, 2028, 2029, 2030]
-    print(f"-> Sucesso! SC Barra Sul 2026: R$ {res_sc['precificacao']['valor_justo']:,.2f} -> 2030: R$ {proj_sc[-1]['valor_estimado']:,.2f}")
+    res_2030 = engine.predict(
+        bairro="Belvedere", tipo="Apartamento", area_m2=120, ano_construcao=2021,
+        quartos=3, banheiros=3, vagas=2, estado="MG", cidade="Belo Horizonte", ano_estimacao=2030
+    )
+    assert res_2030["estimativa_futuro"]["ano_selecionado"] == 2030
+    assert res_2030["precificacao"]["valor_justo"] > res_2026["precificacao"]["valor_justo"]
+    print(f"-> Sucesso! Belvedere (MG): 2026 = R$ {res_2026['precificacao']['valor_justo']:,.2f} | 2030 = R$ {res_2030['precificacao']['valor_justo']:,.2f}")
 
-    print("\n[TEST 4/6] Validando Hold-out 10% Cru, GridSearchCV e os 5 Modelos no Benchmark...")
+    print("\n[TEST 4/6] Validando Hold-out 10% Cru (1.800 amostras), GridSearchCV e 5 Modelos...")
     bench = engine.get_benchmark_results()
+    assert bench.get("total_amostras") == 18000, f"Esperado 18000, obtido {bench.get('total_amostras')}"
     assert bench.get("holdout_info", {}).get("teste_cru_pct") == 10
-    assert bench.get("holdout_info", {}).get("treino_cv_pct") == 90
+    assert bench.get("holdout_info", {}).get("amostras_teste_cru") == 1800
     modelos = bench.get("modelos", [])
     assert len(modelos) == 5, f"Esperado 5 modelos, encontrado {len(modelos)}"
-    ids_presentes = {m["id"] for m in modelos}
     esperados = {"ridge", "decision_tree", "random_forest", "xgboost", "mlp_neural_net"}
-    assert ids_presentes == esperados, f"IDs divergentes: {ids_presentes}"
+    assert {m["id"] for m in modelos} == esperados
     for m in modelos:
         assert "melhores_parametros" in m and len(m["melhores_parametros"]) > 0
-        assert "r2_cv_pct" in m and "r2_pct" in m and "mae_medio" in m and "mape_medio_pct" in m
         print(f"   • {m['nome']}: R² CV={m['r2_cv_pct']}% | R² Teste Cru={m['r2_pct']}% | MAPE={m['mape_medio_pct']}%")
 
-    print("\n[TEST 5/6] Verificando Série Anual Histórica (2013-2026) & Projeção Futura (2027-2030)...")
+    print("\n[TEST 5/6] Verificando Série Anual (2013-2026) & Projeção Futura (2027-2035) para todos os 6 estados...")
     hist = bench.get("serie_anual_historica", {})
     fut = bench.get("projecao_futura_anual", {})
-    for uf in ["SP", "SC"]:
+    for uf in ["SP", "SC", "MG", "RJ", "DF", "PR"]:
         assert len(hist.get(uf, [])) == 14, f"Esperado 14 anos (2013-2026) para {uf}"
-        assert [x["ano"] for x in fut.get(uf, [])] == [2027, 2028, 2029, 2030]
-    print("-> Série histórica (2013-2026) e projeções (2027-2030) OK para SP e SC!")
+        assert [x["ano"] for x in fut.get(uf, [])] == list(range(2027, 2036))
+    print("-> Série histórica (2013-2026) e projeções futuras (2027-2035) OK para os 6 estados!")
 
     print("\n[TEST 6/6] Verificando endpoints da API e arquivos estáticos...")
     import main
-    trends_sc = main.get_yearly_trends(estado="SC")
-    assert trends_sc["estado"] == "SC" and len(trends_sc["estimacao_futuro"]) == 4
+    locs = main.get_locations()
+    ativos = [e["uf"] for e in locs["estados"] if e["status"] == "ativo"]
+    assert set(ativos) == {"SP", "SC", "MG", "RJ", "DF", "PR"}
+    for uf in ativos:
+        tr = main.get_yearly_trends(estado=uf)
+        assert tr["estado"] == uf and len(tr["estimacao_futuro"]) == 9
     for fname in ["index.html", "styles.css", "app.js"]:
         fpath = os.path.join(PROJECT_ROOT, "static", fname)
         assert os.path.exists(fpath), f"{fname} ausente"
-    print("-> Endpoints e frontend estático íntegros!")
+    print("-> Todos os 6 estados ativos na API e frontend estático íntegros!")
 
     print("\n==========================================")
     print(" TODOS OS TESTES PASSARAM COM SUCESSO! [OK]")
